@@ -10,6 +10,40 @@
 
 <style>
 
+/* UKRYJ WSZYSTKO NA START */
+
+.shape {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* AKTYWNY */
+
+.shape.active {
+    opacity: 1;
+}
+
+/* ANIMACJA RYSOWANIA */
+
+#propertySVG path,
+#propertySVG rect,
+#propertySVG line {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+.draw path,
+.draw rect,
+.draw line {
+    stroke-dashoffset: 0;
+}
+    
 /* ================== DESIGN SYSTEM ================== */
 
 :root {
@@ -215,12 +249,8 @@ svg {
 
 <script>
 
-/* ================== STATE ================== */
-
 let step = 0;
 let data = {};
-
-/* ================== FLOW ================== */
 
 function start() {
     nextStep();
@@ -231,15 +261,19 @@ function nextStep() {
 
     const content = document.getElementById("content");
 
+    /* ===== STEP 1 ===== */
+
     if (step === 1) {
         content.innerHTML = `
             <h1>Co sprzedajesz?</h1>
 
-            <div class="option" onclick="selectType('Mieszkanie')">Mieszkanie</div>
-            <div class="option" onclick="selectType('Dom')">Dom</div>
-            <div class="option" onclick="selectType('Działka')">Działka</div>
+            <div class="option" onclick="selectType('apartment')">Mieszkanie</div>
+            <div class="option" onclick="selectType('house')">Dom</div>
+            <div class="option" onclick="selectType('land')">Działka</div>
         `;
     }
+
+    /* ===== STEP 2 ===== */
 
     if (step === 2) {
         content.innerHTML = `
@@ -250,29 +284,60 @@ function nextStep() {
             <button class="button" onclick="saveSize()">Dalej</button>
         `;
     }
+
+    /* ===== STEP 3 (FIX) ===== */
+
+    if (step === 3) {
+        content.innerHTML = `
+            <h1>Dzięki.</h1>
+            <p>Przechodzimy dalej w procesie sprzedaży.</p>
+        `;
+    }
 }
 
-/* ================== VISUAL ================== */
+/* ================= SVG ================= */
+
+function resetShapes() {
+    document.querySelectorAll(".shape").forEach(el => {
+        el.classList.remove("active");
+    });
+}
 
 function drawProperty() {
-    document.getElementById("propertySVG").classList.add("draw");
+    const svg = document.getElementById("propertySVG");
+
+    svg.classList.remove("draw");
+
+    setTimeout(() => {
+        svg.classList.add("draw");
+    }, 50);
 }
 
 function setType(type) {
-    document.getElementById("propertyType").innerText = type.toUpperCase() + "+";
+
+    resetShapes();
+
+    document.getElementById(type).classList.add("active");
+
+    drawProperty();
+
+    /* tekst */
+
+    let label = "";
+
+    if (type === "apartment") label = "MIESZKANIE+";
+    if (type === "house") label = "DOM+";
+    if (type === "land") label = "DZIAŁKA+";
+
+    document.getElementById("propertyType").innerText = label;
 }
 
-function setSize(size) {
-    document.getElementById("propertySize").innerText = size + " m²";
-}
-
-/* ================== ACTIONS ================== */
+/* ================= ACTIONS ================= */
 
 function selectType(type) {
     data.type = type;
 
     setType(type);
-    drawProperty();
 
     nextStep();
 }
@@ -287,7 +352,7 @@ function saveSize() {
 
     data.size = size;
 
-    setSize(size);
+    document.getElementById("propertySize").innerText = size + " m²";
 
     nextStep();
 }
