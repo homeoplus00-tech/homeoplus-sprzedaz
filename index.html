@@ -13,8 +13,23 @@
 body{margin:0;font-family:Montserrat;background:#1B1C1E;}
 
 .container{display:flex;height:100vh;}
-.left{width:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.right{width:50%;background:white;padding:80px;display:flex;flex-direction:column;justify-content:center;}
+
+.left{
+width:50%;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.right{
+width:50%;
+background:white;
+padding:80px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
 
 @media(max-width:900px){
 .container{flex-direction:column;}
@@ -22,23 +37,58 @@ body{margin:0;font-family:Montserrat;background:#1B1C1E;}
 .right{height:60%;width:100%;padding:30px;}
 }
 
-h1{font-size:36px;font-weight:800;}
-.option{border:1px solid #ddd;padding:14px;margin-top:10px;cursor:pointer;}
-.input{margin-top:15px;padding:12px;width:100%;border:none;border-bottom:1px solid #ccc;}
-.button{margin-top:20px;padding:14px;background:#ebdaa8;border:none;cursor:pointer;}
+h1{font-size:40px;font-weight:800;}
 
-svg{width:300px;margin-bottom:40px;}
-svg path, svg rect, svg line{
-fill:none;stroke:#ebdaa8;stroke-width:2;
-stroke-dasharray:400;stroke-dashoffset:400;transition:0.8s;
+.option{
+border:1px solid #ddd;
+padding:14px;
+margin-top:10px;
+cursor:pointer;
+transition:0.2s;
 }
-.draw path, .draw rect, .draw line{stroke-dashoffset:0;}
+
+.option:hover{border-color:black;}
+
+.button{
+margin-top:20px;
+padding:14px;
+background:#ebdaa8;
+border:none;
+cursor:pointer;
+}
+
+/* SVG */
+
+svg{
+width:300px;
+margin-bottom:40px;
+}
+
+svg path, svg rect, svg line{
+fill:none;
+stroke:#ebdaa8;
+stroke-width:2;
+stroke-linecap:round;
+
+stroke-dasharray:400;
+stroke-dashoffset:400;
+transition:0.8s;
+}
+
+.draw path, .draw rect, .draw line{
+stroke-dashoffset:0;
+}
+
+/* STAN */
+
+.problem path{stroke-dasharray:6;}
+.refresh path{opacity:0.5;}
+
+/* KARTA */
 
 .card{color:#ebdaa8;}
 .card strong{display:block;font-weight:800;}
 .card span{opacity:0.8;font-size:14px;}
-
-.problem path{stroke-dasharray:6;}
 
 </style>
 </head>
@@ -67,22 +117,31 @@ stroke-dasharray:400;stroke-dashoffset:400;transition:0.8s;
 
 <script>
 
+/* ===== STATE ===== */
+
 let data={};
 
+/* ===== START ===== */
+
+function start(){
+stepType();
+}
+
 /* ===== FLOW ===== */
-
-function start(){stepType();}
-
-/* TYP */
 
 function stepType(){
 set(`
 <h1>Typ nieruchomości</h1>
+
 <div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
+<div class="option" onclick="chooseType('dom')">Dom</div>
+<div class="option" onclick="chooseType('lokal')">Lokal usługowy</div>
+<div class="option" onclick="chooseType('hala')">Magazyn / hala</div>
+<div class="option" onclick="chooseType('dzialka')">Działka</div>
 `);
 }
 
-/* POKOJE */
+/* ===== MIESZKANIE FLOW ===== */
 
 function stepRooms(){
 set(`
@@ -90,28 +149,6 @@ set(`
 ${[1,2,3,4,5].map(n=>`<div class="option" onclick="setRooms(${n})">${n===5?"5+":n}</div>`).join("")}
 `);
 }
-
-/* METRAŻ */
-
-function stepSize(){
-set(`
-<h1>Metraż (m²)</h1>
-<input id="size" class="input" placeholder="np. 65">
-<button class="button" onclick="saveSize()">Dalej</button>
-`);
-}
-
-/* PIĘTRO */
-
-function stepFloor(){
-set(`
-<h1>Piętro</h1>
-<input id="floor" class="input" placeholder="np. 3">
-<button class="button" onclick="saveFloor()">Dalej</button>
-`);
-}
-
-/* BALKON */
 
 function stepBalcony(){
 set(`
@@ -121,71 +158,67 @@ set(`
 `);
 }
 
-/* STAN TECH */
-
-function stepCondition(){
+function stepState(){
 set(`
-<h1>Stan techniczny</h1>
-<div class="option" onclick="setCondition('ideal')">Gotowe</div>
-<div class="option" onclick="setCondition('refresh')">Do odświeżenia</div>
-<div class="option" onclick="setCondition('renovation')">Do remontu</div>
+<h1>Stan nieruchomości</h1>
+
+<div class="option" onclick="setState('ideal')">Gotowa</div>
+<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
+<div class="option" onclick="setState('renovation')">Do remontu</div>
+<div class="option" onclick="setState('problem')">Problemy prawne</div>
 `);
-}
-
-/* STAN PRAWNY */
-
-function stepLegal(){
-set(`
-<h1>Stan prawny</h1>
-<div class="option" onclick="setLegal('clean')">Brak problemów</div>
-<div class="option" onclick="setLegal('mortgage')">Kredyt</div>
-<div class="option" onclick="setLegal('problem')">Problem prawny</div>
-`);
-}
-
-/* ZDJĘCIA */
-
-function stepPhotos(){
-set(`
-<h1>Zdjęcia nieruchomości</h1>
-<input type="file" multiple class="input" onchange="savePhotos(event)">
-`);
-}
-
-/* CENA */
-
-function stepPrice(){
-set(`
-<h1>Oczekiwana cena</h1>
-<input id="price" class="input" placeholder="np. 650000">
-<button class="button" onclick="savePrice()">Dalej</button>
-`);
-}
-
-/* ANALIZA */
-
-function analyze(){
-
-let c=document.getElementById("content");
-
-if(data.legal==="problem" || data.condition==="renovation"){
-c.innerHTML=`<h1>OD ZERA+</h1><p>Twoja nieruchomość wymaga pełnej obsługi.</p>`;
-}else{
-c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
-}
-
 }
 
 /* ===== SVG ===== */
 
-function drawBase(){
+function drawBase(type){
+
 let svg=document.getElementById("svg");
+svg.innerHTML="";
+svg.className="";
+
+/* DOM */
+
+if(type==="dom"){
+svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
+}
+
+/* BLOK */
+
+if(type==="mieszkanie"){
 svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
+}
+
+/* LOKAL */
+
+if(type==="lokal"){
+svg.innerHTML=`<rect x="120" y="180" width="160" height="120"/>`;
+}
+
+/* HALA */
+
+if(type==="hala"){
+svg.innerHTML=`<rect x="80" y="200" width="240" height="100"/>`;
+}
+
+/* DZIAŁKA */
+
+if(type==="dzialka"){
+svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
+}
+
 animate();
 }
 
+/* PLAN MIESZKANIA */
+
 function drawRooms(n){
+
+if(data.type!=="mieszkanie") return;
+
 let svg=document.getElementById("svg");
+
+/* usuwamy stare */
 svg.querySelectorAll(".room").forEach(e=>e.remove());
 
 if(n>=2)addLine(200,120,200,320);
@@ -206,10 +239,14 @@ l.setAttribute("class","room");
 document.getElementById("svg").appendChild(l);
 }
 
+/* BALKON */
+
 function drawBalcony(show){
+
 let svg=document.getElementById("svg");
+
 let old=svg.querySelector("#balcony");
-if(old)old.remove();
+if(old) old.remove();
 
 if(show){
 let b=document.createElementNS("http://www.w3.org/2000/svg","rect");
@@ -220,67 +257,76 @@ b.setAttribute("height",20);
 b.setAttribute("id","balcony");
 svg.appendChild(b);
 }
+
 animate();
 }
 
-function applyState(){
+/* STAN */
+
+function applyState(state){
+
 let svg=document.getElementById("svg");
 svg.className="";
 
-if(data.legal==="problem") svg.classList.add("problem");
+if(state==="problem") svg.classList.add("problem");
+if(state==="refresh") svg.classList.add("refresh");
 }
 
 /* ===== ACTIONS ===== */
 
 function chooseType(t){
+data={};
 data.type=t;
-drawBase();
-document.getElementById("type").innerText="Mieszkanie";
+
+drawBase(t);
+
+document.getElementById("type").innerText=t;
+
+if(t==="mieszkanie"){
 stepRooms();
+}else{
+stepState();
+}
 }
 
 function setRooms(n){
 data.rooms=n;
+
 drawRooms(n);
+
 document.getElementById("details").innerText=roomsText(n);
-stepSize();
-}
 
-function saveSize(){
-data.size=document.getElementById("size").value;
-stepFloor();
-}
-
-function saveFloor(){
-data.floor=document.getElementById("floor").value;
 stepBalcony();
 }
 
 function setBalcony(v){
 data.balcony=v;
+
 drawBalcony(v);
-stepCondition();
+
+stepState();
 }
 
-function setCondition(c){
-data.condition=c;
-stepLegal();
-}
+function setState(s){
+data.state=s;
 
-function setLegal(l){
-data.legal=l;
-applyState();
-stepPhotos();
-}
+applyState(s);
 
-function savePhotos(e){
-data.photos=e.target.files;
-stepPrice();
-}
-
-function savePrice(){
-data.price=document.getElementById("price").value;
 analyze();
+}
+
+/* ===== ANALIZA ===== */
+
+function analyze(){
+
+let c=document.getElementById("content");
+
+if(data.state==="problem" || data.state==="renovation"){
+c.innerHTML=`<h1>OD ZERA+</h1><p>Przejmujemy proces od podstaw.</p>`;
+}else{
+c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
+}
+
 }
 
 /* ===== UTILS ===== */
