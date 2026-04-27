@@ -9,9 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-
 body{margin:0;font-family:Montserrat;background:#1B1C1E;}
-
 .container{display:flex;height:100vh;}
 
 .left{
@@ -37,38 +35,23 @@ justify-content:center;
 .right{height:60%;width:100%;padding:30px;}
 }
 
-h1{font-size:40px;font-weight:800;}
+h1{font-size:38px;font-weight:800;}
 
 .option{
 border:1px solid #ddd;
 padding:14px;
 margin-top:10px;
 cursor:pointer;
-transition:0.2s;
 }
 
 .option:hover{border-color:black;}
 
-.button{
-margin-top:20px;
-padding:14px;
-background:#ebdaa8;
-border:none;
-cursor:pointer;
-}
-
-/* SVG */
-
-svg{
-width:300px;
-margin-bottom:40px;
-}
+svg{width:300px;margin-bottom:40px;}
 
 svg path, svg rect, svg line{
 fill:none;
 stroke:#ebdaa8;
 stroke-width:2;
-stroke-linecap:round;
 
 stroke-dasharray:400;
 stroke-dashoffset:400;
@@ -79,16 +62,9 @@ transition:0.8s;
 stroke-dashoffset:0;
 }
 
-/* STAN */
-
-.problem path{stroke-dasharray:6;}
-.refresh path{opacity:0.5;}
-
-/* KARTA */
-
 .card{color:#ebdaa8;}
-.card strong{display:block;font-weight:800;}
-.card span{opacity:0.8;font-size:14px;}
+.card strong{font-weight:800;}
+.card span{opacity:0.8;}
 
 </style>
 </head>
@@ -98,36 +74,65 @@ stroke-dashoffset:0;
 <div class="container">
 
 <div class="left">
-
 <svg id="svg" viewBox="0 0 400 400"></svg>
 
 <div class="card">
 <strong id="type"></strong>
 <span id="details"></span>
 </div>
-
 </div>
 
 <div class="right" id="content">
 <h1>SPRZEDAŻ+</h1>
-<button class="button" onclick="start()">Start</button>
+<div class="option" onclick="start()">Start</div>
 </div>
 
 </div>
 
 <script>
 
-/* ===== STATE ===== */
+/* ================= ENGINE ================= */
 
-let data={};
+let data = {};
+let flow = [];
+let stepIndex = 0;
 
-/* ===== START ===== */
+/* ================= FLOWS ================= */
+
+const flows = {
+
+mieszkanie: [
+stepRooms,
+stepBalcony,
+stepState
+],
+
+dom: [
+stepRooms,
+stepState
+],
+
+lokal: [
+stepState
+],
+
+hala: [
+stepState
+],
+
+dzialka: [
+stepState
+]
+
+};
+
+/* ================= START ================= */
 
 function start(){
 stepType();
 }
 
-/* ===== FLOW ===== */
+/* ================= TYPE ================= */
 
 function stepType(){
 set(`
@@ -141,7 +146,19 @@ set(`
 `);
 }
 
-/* ===== MIESZKANIE FLOW ===== */
+/* ================= FLOW CONTROL ================= */
+
+function next(){
+stepIndex++;
+
+if(stepIndex < flow.length){
+flow[stepIndex]();
+}else{
+analyze();
+}
+}
+
+/* ================= STEPS ================= */
 
 function stepRooms(){
 set(`
@@ -165,43 +182,32 @@ set(`
 <div class="option" onclick="setState('ideal')">Gotowa</div>
 <div class="option" onclick="setState('refresh')">Do odświeżenia</div>
 <div class="option" onclick="setState('renovation')">Do remontu</div>
-<div class="option" onclick="setState('problem')">Problemy prawne</div>
+<div class="option" onclick="setState('problem')">Problemy</div>
 `);
 }
 
-/* ===== SVG ===== */
+/* ================= SVG ================= */
 
 function drawBase(type){
 
 let svg=document.getElementById("svg");
 svg.innerHTML="";
-svg.className="";
-
-/* DOM */
-
-if(type==="dom"){
-svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
-}
-
-/* BLOK */
 
 if(type==="mieszkanie"){
 svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
 }
 
-/* LOKAL */
+if(type==="dom"){
+svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
+}
 
 if(type==="lokal"){
 svg.innerHTML=`<rect x="120" y="180" width="160" height="120"/>`;
 }
 
-/* HALA */
-
 if(type==="hala"){
 svg.innerHTML=`<rect x="80" y="200" width="240" height="100"/>`;
 }
-
-/* DZIAŁKA */
 
 if(type==="dzialka"){
 svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
@@ -210,15 +216,12 @@ svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
 animate();
 }
 
-/* PLAN MIESZKANIA */
-
 function drawRooms(n){
 
 if(data.type!=="mieszkanie") return;
 
 let svg=document.getElementById("svg");
 
-/* usuwamy stare */
 svg.querySelectorAll(".room").forEach(e=>e.remove());
 
 if(n>=2)addLine(200,120,200,320);
@@ -239,16 +242,14 @@ l.setAttribute("class","room");
 document.getElementById("svg").appendChild(l);
 }
 
-/* BALKON */
-
-function drawBalcony(show){
+function drawBalcony(v){
 
 let svg=document.getElementById("svg");
 
 let old=svg.querySelector("#balcony");
 if(old) old.remove();
 
-if(show){
+if(v){
 let b=document.createElementNS("http://www.w3.org/2000/svg","rect");
 b.setAttribute("x",150);
 b.setAttribute("y",320);
@@ -261,18 +262,7 @@ svg.appendChild(b);
 animate();
 }
 
-/* STAN */
-
-function applyState(state){
-
-let svg=document.getElementById("svg");
-svg.className="";
-
-if(state==="problem") svg.classList.add("problem");
-if(state==="refresh") svg.classList.add("refresh");
-}
-
-/* ===== ACTIONS ===== */
+/* ================= ACTIONS ================= */
 
 function chooseType(t){
 data={};
@@ -282,69 +272,65 @@ drawBase(t);
 
 document.getElementById("type").innerText=t;
 
-if(t==="mieszkanie"){
-stepRooms();
-}else{
-stepState();
-}
+flow = flows[t];
+stepIndex = 0;
+
+flow[0]();
 }
 
 function setRooms(n){
 data.rooms=n;
-
 drawRooms(n);
-
-document.getElementById("details").innerText=roomsText(n);
-
-stepBalcony();
+updateDetails();
+next();
 }
 
 function setBalcony(v){
 data.balcony=v;
-
 drawBalcony(v);
-
-stepState();
+next();
 }
 
 function setState(s){
 data.state=s;
-
-applyState(s);
-
-analyze();
+next();
 }
 
-/* ===== ANALIZA ===== */
-
-function analyze(){
-
-let c=document.getElementById("content");
-
-if(data.state==="problem" || data.state==="renovation"){
-c.innerHTML=`<h1>OD ZERA+</h1><p>Przejmujemy proces od podstaw.</p>`;
-}else{
-c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
-}
-
-}
-
-/* ===== UTILS ===== */
-
-function roomsText(n){
-if(n===1)return"1 pokój";
-if(n<=4)return n+" pokoje";
-return n+" pokoi";
-}
+/* ================= UI ================= */
 
 function set(html){
 document.getElementById("content").innerHTML=html;
 }
 
+function updateDetails(){
+if(data.rooms){
+document.getElementById("details").innerText=
+(data.rooms===1?"1 pokój":
+data.rooms<=4?data.rooms+" pokoje":
+data.rooms+" pokoi");
+}
+}
+
+/* ================= ANIM ================= */
+
 function animate(){
 let svg=document.getElementById("svg");
 svg.classList.remove("draw");
 setTimeout(()=>svg.classList.add("draw"),50);
+}
+
+/* ================= ANALIZA ================= */
+
+function analyze(){
+
+let c=document.getElementById("content");
+
+if(data.state==="problem"||data.state==="renovation"){
+c.innerHTML=`<h1>OD ZERA+</h1><p>Przejmujemy proces od podstaw.</p>`;
+}else{
+c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
+}
+
 }
 
 </script>
