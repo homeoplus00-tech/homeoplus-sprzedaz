@@ -1,243 +1,194 @@
-<section id="homeo-system">
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOMEO+ SPRZEDAŻ+</title>
 
-<div class="layout">
-
-<!-- LEFT SIDE -->
-<div class="left">
-
-  <div class="card" id="card">
-    <div class="type">—</div>
-    <div class="location">—</div>
-    <div class="details">—</div>
-    <div class="price">—</div>
-    <div class="extra">—</div>
-  </div>
-
-  <!-- SVG PROPERTY -->
-  <svg id="visual" viewBox="0 0 200 200">
-    <rect x="40" y="80" width="120" height="80" fill="#ebdaa8"/>
-    <polygon points="40,80 100,40 160,80" fill="#ebdaa8"/>
-  </svg>
-
-</div>
-
-<!-- RIGHT SIDE -->
-<div class="right">
-
-<div class="step active">
-<h2>SPRZEDAŻ+</h2>
-<p>Konfigurujemy sprzedaż Twojej nieruchomości.</p>
-<button onclick="next()">Start</button>
-</div>
-
-<div class="step">
-<h3>Typ nieruchomości</h3>
-<div class="options">
-  <div onclick="setType('Mieszkanie')">Mieszkanie</div>
-  <div onclick="setType('Dom')">Dom</div>
-  <div onclick="setType('Działka')">Działka</div>
-  <div onclick="setType('Lokal usługowy')">Lokal usługowy</div>
-  <div onclick="setType('Hala / magazyn')">Hala / magazyn</div>
-</div>
-</div>
-
-<div class="step">
-<h3>Lokalizacja</h3>
-<input id="city" placeholder="Miasto">
-<input id="street" placeholder="Ulica (opcjonalnie)">
-<button onclick="next()">Dalej</button>
-</div>
-
-<div class="step">
-<h3>Parametry</h3>
-<input id="area" placeholder="Metraż m²">
-<input id="rooms" placeholder="Liczba pokoi">
-<input id="floor" placeholder="Piętro (jeśli dotyczy)">
-<button onclick="next()">Dalej</button>
-</div>
-
-<div class="step">
-<h3>Stan nieruchomości</h3>
-<div class="options">
-  <div onclick="setState('ideal')">Gotowa</div>
-  <div onclick="setState('remont')">Do remontu</div>
-  <div onclick="setState('problem')">Problemy prawne / chaos</div>
-</div>
-</div>
-
-<div class="step" id="zeroStep">
-<h3>OD ZERA+</h3>
-<p>Rozwiążemy problemy, przygotujemy i sprzedamy.</p>
-<button onclick="next()">Kontynuuj</button>
-</div>
-
-<div class="step">
-<h3>Cena oczekiwana</h3>
-<input id="price" placeholder="np. 950000">
-<button onclick="next()">Dalej</button>
-</div>
-
-<div class="step">
-<h3>Dodatkowe informacje</h3>
-<textarea id="desc" placeholder="Stan, wyposażenie, sytuacja..."></textarea>
-<button onclick="next()">Dalej</button>
-</div>
-
-<div class="step">
-<h3>Dane kontaktowe</h3>
-<input id="name" placeholder="Imię">
-<input id="email" placeholder="Email">
-<input id="phone" placeholder="Telefon">
-<button onclick="submit()">Wyślij</button>
-</div>
-
-</div>
-</div>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-#homeo-system{
-  font-family:Montserrat;
-  background:#1B1C1E;
-  color:#fff;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.layout{
-  display:flex;
-  min-height:100vh;
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #1B1C1E;
+    color: white;
+    overflow: hidden;
 }
 
-.left{
-  width:50%;
-  padding:40px;
+/* LAYOUT */
+
+.container {
+    display: flex;
+    height: 100vh;
 }
 
-.card{
-  border:1px solid #ebdaa8;
-  padding:20px;
-  margin-bottom:40px;
+.left {
+    width: 50%;
+    background: #1B1C1E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-svg{
-  width:200px;
-  transition:0.5s;
+.right {
+    width: 50%;
+    background: white;
+    color: black;
+    padding: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.right{
-  width:50%;
-  padding:60px;
+/* TYPO */
+
+h1 {
+    font-size: 42px;
+    font-weight: 800;
 }
 
-.step{display:none;}
-.step.active{display:block;}
-
-.options div{
-  border:1px solid #ebdaa8;
-  padding:10px;
-  margin:10px 0;
-  cursor:pointer;
+p {
+    margin-top: 20px;
+    opacity: 0.7;
 }
 
-.options div:hover{
-  background:#ebdaa8;
-  color:#000;
+/* BUTTONS */
+
+.button {
+    margin-top: 40px;
+    padding: 18px 32px;
+    background: #ebdaa8;
+    color: black;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-input, textarea{
-  display:block;
-  margin:10px 0;
-  padding:10px;
-  width:300px;
-  background:none;
-  border-bottom:1px solid #fff;
-  color:#fff;
+.button:hover {
+    background: black;
+    color: #ebdaa8;
 }
 
-button{
-  margin-top:20px;
-  padding:10px 20px;
-  border:1px solid #ebdaa8;
-  background:none;
-  color:#ebdaa8;
+/* OPTIONS */
+
+.option {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.option:hover {
+    border-color: black;
+}
+
+/* VISUAL */
+
+.house {
+    width: 200px;
+    height: 200px;
+    border: 2px solid #ebdaa8;
+    position: relative;
+    opacity: 0;
+    transition: 1s;
+}
+
+.house.active {
+    opacity: 1;
+}
+
+.size {
+    position: absolute;
+    bottom: -40px;
+    color: #ebdaa8;
 }
 </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LEFT VISUAL -->
+    <div class="left">
+        <div class="house" id="house">
+            <div class="size" id="size"></div>
+        </div>
+    </div>
+
+    <!-- RIGHT FLOW -->
+    <div class="right" id="content">
+
+        <h1>SPRZEDAŻ+</h1>
+        <p>Zaczynamy proces sprzedaży Twojej nieruchomości.</p>
+
+        <button class="button" onclick="start()">Rozpocznij</button>
+
+    </div>
+
+</div>
 
 <script>
-let step=0;
 
-let data={
-  type:"",
-  city:"",
-  street:"",
-  area:"",
-  rooms:"",
-  floor:"",
-  state:"",
-  price:"",
-  desc:"",
-  name:"",
-  email:"",
-  phone:""
-};
+let step = 0;
+let data = {};
 
-const steps=document.querySelectorAll(".step");
-
-function next(){
-  steps[step].classList.remove("active");
-  step++;
-  steps[step].classList.add("active");
-  updateCard();
+function start() {
+    nextStep();
 }
 
-function setType(t){
-  data.type=t;
-  next();
+function nextStep() {
+    step++;
+
+    const content = document.getElementById("content");
+
+    if (step === 1) {
+        content.innerHTML = `
+            <h1>Co sprzedajesz?</h1>
+            <div class="option" onclick="selectType('mieszkanie')">Mieszkanie</div>
+            <div class="option" onclick="selectType('dom')">Dom</div>
+            <div class="option" onclick="selectType('dzialka')">Działka</div>
+        `;
+    }
+
+    if (step === 2) {
+        content.innerHTML = `
+            <h1>Podaj metraż</h1>
+            <input type="number" id="sizeInput" placeholder="np. 75" style="padding:15px; margin-top:20px;">
+            <button class="button" onclick="saveSize()">Dalej</button>
+        `;
+    }
 }
 
-function setState(s){
-  data.state=s;
+function selectType(type) {
+    data.type = type;
 
-  if(s==="problem"){
-    step=5; // OD ZERA
-  }else{
-    next();
-  }
+    document.getElementById("house").classList.add("active");
+
+    nextStep();
 }
 
-function updateCard(){
-  data.city=city.value;
-  data.street=street.value;
-  data.area=area.value;
-  data.rooms=rooms.value;
-  data.floor=floor.value;
-  data.price=price.value;
+function saveSize() {
+    const size = document.getElementById("sizeInput").value;
 
-  document.querySelector(".type").innerText=data.type || "—";
-  document.querySelector(".location").innerText=data.city || "—";
-  document.querySelector(".details").innerText=
-    (data.area?data.area+"m² ":"")+
-    (data.rooms?data.rooms+" pokoi ":"")+
-    (data.floor?"piętro "+data.floor:"");
+    if (!size) return alert("Podaj metraż");
 
-  document.querySelector(".price").innerText=
-    data.price?data.price+" zł":"—";
+    data.size = size;
+
+    document.getElementById("size").innerText = size + " m²";
+
+    nextStep();
 }
 
-async function submit(){
-
-  data.name=name.value;
-  data.email=email.value;
-  data.phone=phone.value;
-  data.desc=desc.value;
-
-  // 🔥 LEPSZE NIŻ FORMSPREE (WEBHOOK)
-  await fetch("https://hook.eu1.make.com/XXXXXXX", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(data)
-  });
-
-  alert("Zgłoszenie wysłane");
-}
 </script>
 
-</section>
+</body>
+</html>
