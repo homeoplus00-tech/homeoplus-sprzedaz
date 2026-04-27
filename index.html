@@ -10,33 +10,11 @@
 
 <style>
 
-body{
-margin:0;
-font-family:Montserrat;
-background:#1B1C1E;
-}
+body{margin:0;font-family:Montserrat;background:#1B1C1E;}
 
-.container{
-display:flex;
-height:100vh;
-}
-
-.left{
-width:50%;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
-
-.right{
-width:50%;
-background:white;
-padding:80px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-}
+.container{display:flex;height:100vh;}
+.left{width:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.right{width:50%;background:white;padding:80px;display:flex;flex-direction:column;justify-content:center;}
 
 @media(max-width:900px){
 .container{flex-direction:column;}
@@ -44,74 +22,23 @@ justify-content:center;
 .right{height:60%;width:100%;padding:30px;}
 }
 
-h1{font-size:42px;font-weight:800;}
+h1{font-size:36px;font-weight:800;}
+.option{border:1px solid #ddd;padding:14px;margin-top:10px;cursor:pointer;}
+.input{margin-top:15px;padding:12px;width:100%;border:none;border-bottom:1px solid #ccc;}
+.button{margin-top:20px;padding:14px;background:#ebdaa8;border:none;cursor:pointer;}
 
-.option{
-border:1px solid #ddd;
-padding:14px;
-margin-top:10px;
-cursor:pointer;
-}
-
-.option:active{
-transform:scale(0.98);
-}
-
-.button{
-margin-top:20px;
-padding:14px;
-background:#ebdaa8;
-border:none;
-cursor:pointer;
-}
-
-/* SVG */
-
-svg{
-width:300px;
-margin-bottom:40px;
-}
-
+svg{width:300px;margin-bottom:40px;}
 svg path, svg rect, svg line{
-fill:none;
-stroke:#ebdaa8;
-stroke-width:2;
-stroke-linecap:round;
-
-stroke-dasharray:400;
-stroke-dashoffset:400;
-transition:0.8s;
+fill:none;stroke:#ebdaa8;stroke-width:2;
+stroke-dasharray:400;stroke-dashoffset:400;transition:0.8s;
 }
+.draw path, .draw rect, .draw line{stroke-dashoffset:0;}
 
-.draw path, .draw rect, .draw line{
-stroke-dashoffset:0;
-}
+.card{color:#ebdaa8;}
+.card strong{display:block;font-weight:800;}
+.card span{opacity:0.8;font-size:14px;}
 
-/* STAN */
-
-.problem path, .problem rect, .problem line{
-stroke-dasharray:6;
-}
-
-.refresh path{
-opacity:0.5;
-}
-
-/* KARTA */
-
-.card{
-color:#ebdaa8;
-}
-
-.card strong{
-font-weight:800;
-display:block;
-margin-bottom:5px;
-}
-
-.card span{
-opacity:0.8;
-}
+.problem path{stroke-dasharray:6;}
 
 </style>
 </head>
@@ -142,120 +69,129 @@ opacity:0.8;
 
 let data={};
 
-/* FLOW CONTROL */
+/* ===== FLOW ===== */
 
-function start(){
-stepType();
-}
+function start(){stepType();}
 
-/* ================= KROKI ================= */
+/* TYP */
 
 function stepType(){
-setContent(`
+set(`
 <h1>Typ nieruchomości</h1>
-
 <div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
-<div class="option" onclick="chooseType('dom')">Dom</div>
-<div class="option" onclick="chooseType('lokal')">Lokal usługowy</div>
-<div class="option" onclick="chooseType('hala')">Magazyn / hala</div>
-<div class="option" onclick="chooseType('dzialka')">Działka</div>
 `);
 }
+
+/* POKOJE */
 
 function stepRooms(){
-setContent(`
+set(`
 <h1>Liczba pokoi</h1>
-
-<div class="option" onclick="chooseRooms(1)">1</div>
-<div class="option" onclick="chooseRooms(2)">2</div>
-<div class="option" onclick="chooseRooms(3)">3</div>
-<div class="option" onclick="chooseRooms(4)">4</div>
-<div class="option" onclick="chooseRooms(5)">5+</div>
+${[1,2,3,4,5].map(n=>`<div class="option" onclick="setRooms(${n})">${n===5?"5+":n}</div>`).join("")}
 `);
 }
+
+/* METRAŻ */
+
+function stepSize(){
+set(`
+<h1>Metraż (m²)</h1>
+<input id="size" class="input" placeholder="np. 65">
+<button class="button" onclick="saveSize()">Dalej</button>
+`);
+}
+
+/* PIĘTRO */
+
+function stepFloor(){
+set(`
+<h1>Piętro</h1>
+<input id="floor" class="input" placeholder="np. 3">
+<button class="button" onclick="saveFloor()">Dalej</button>
+`);
+}
+
+/* BALKON */
 
 function stepBalcony(){
-setContent(`
+set(`
 <h1>Balkon</h1>
-
-<div class="option" onclick="chooseBalcony(true)">Tak</div>
-<div class="option" onclick="chooseBalcony(false)">Nie</div>
+<div class="option" onclick="setBalcony(true)">Tak</div>
+<div class="option" onclick="setBalcony(false)">Nie</div>
 `);
 }
 
-function stepState(){
-setContent(`
-<h1>Stan nieruchomości</h1>
+/* STAN TECH */
 
-<div class="option" onclick="chooseState('ideal')">Gotowa</div>
-<div class="option" onclick="chooseState('refresh')">Do odświeżenia</div>
-<div class="option" onclick="chooseState('renovation')">Do remontu</div>
-<div class="option" onclick="chooseState('problem')">Problemy</div>
+function stepCondition(){
+set(`
+<h1>Stan techniczny</h1>
+<div class="option" onclick="setCondition('ideal')">Gotowe</div>
+<div class="option" onclick="setCondition('refresh')">Do odświeżenia</div>
+<div class="option" onclick="setCondition('renovation')">Do remontu</div>
 `);
 }
 
-/* ================= SVG ================= */
+/* STAN PRAWNY */
 
-function drawBase(type){
+function stepLegal(){
+set(`
+<h1>Stan prawny</h1>
+<div class="option" onclick="setLegal('clean')">Brak problemów</div>
+<div class="option" onclick="setLegal('mortgage')">Kredyt</div>
+<div class="option" onclick="setLegal('problem')">Problem prawny</div>
+`);
+}
 
+/* ZDJĘCIA */
+
+function stepPhotos(){
+set(`
+<h1>Zdjęcia nieruchomości</h1>
+<input type="file" multiple class="input" onchange="savePhotos(event)">
+`);
+}
+
+/* CENA */
+
+function stepPrice(){
+set(`
+<h1>Oczekiwana cena</h1>
+<input id="price" class="input" placeholder="np. 650000">
+<button class="button" onclick="savePrice()">Dalej</button>
+`);
+}
+
+/* ANALIZA */
+
+function analyze(){
+
+let c=document.getElementById("content");
+
+if(data.legal==="problem" || data.condition==="renovation"){
+c.innerHTML=`<h1>OD ZERA+</h1><p>Twoja nieruchomość wymaga pełnej obsługi.</p>`;
+}else{
+c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
+}
+
+}
+
+/* ===== SVG ===== */
+
+function drawBase(){
 let svg=document.getElementById("svg");
-svg.className="";
-
-if(type==="mieszkanie"){
 svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
-}
-
-if(type==="dom"){
-svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
-}
-
-if(type==="lokal"){
-svg.innerHTML=`<rect x="120" y="180" width="160" height="120"/>`;
-}
-
-if(type==="hala"){
-svg.innerHTML=`<rect x="80" y="200" width="240" height="100"/>`;
-}
-
-if(type==="dzialka"){
-svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
-}
-
 animate();
 }
 
-/* PLAN MIESZKANIA */
-
 function drawRooms(n){
-
-if(data.type!=="mieszkanie") return;
-
 let svg=document.getElementById("svg");
-
-/* usuwamy stare */
 svg.querySelectorAll(".room").forEach(e=>e.remove());
 
-/* podział przestrzeni */
-
-if(n===2){
-addLine(200,120,200,320);
-}
-
-if(n===3){
-addLine(200,120,200,320);
-addLine(100,220,200,220);
-}
-
-if(n===4){
-addLine(200,120,200,320);
-addLine(100,220,300,220);
-}
-
-if(n>=5){
-addLine(200,120,200,320);
-addLine(100,220,300,220);
-addLine(150,120,150,320);
-}
+if(n>=2)addLine(200,120,200,320);
+if(n>=3)addLine(100,220,200,220);
+if(n>=4)addLine(200,220,300,220);
+if(n>=5)addLine(150,120,150,320);
 
 animate();
 }
@@ -270,14 +206,10 @@ l.setAttribute("class","room");
 document.getElementById("svg").appendChild(l);
 }
 
-/* BALKON */
-
 function drawBalcony(show){
-
 let svg=document.getElementById("svg");
-
 let old=svg.querySelector("#balcony");
-if(old) old.remove();
+if(old)old.remove();
 
 if(show){
 let b=document.createElementNS("http://www.w3.org/2000/svg","rect");
@@ -288,92 +220,85 @@ b.setAttribute("height",20);
 b.setAttribute("id","balcony");
 svg.appendChild(b);
 }
-
 animate();
 }
 
-/* STAN */
-
-function applyState(state){
-
+function applyState(){
 let svg=document.getElementById("svg");
 svg.className="";
 
-if(state==="problem") svg.classList.add("problem");
-if(state==="refresh") svg.classList.add("refresh");
-
+if(data.legal==="problem") svg.classList.add("problem");
 }
 
-/* ================= ACTIONS ================= */
+/* ===== ACTIONS ===== */
 
 function chooseType(t){
 data.type=t;
-drawBase(t);
-
-document.getElementById("type").innerText=t;
-
-if(t==="mieszkanie"||t==="dom") stepRooms();
-else stepState();
+drawBase();
+document.getElementById("type").innerText="Mieszkanie";
+stepRooms();
 }
 
-function chooseRooms(n){
+function setRooms(n){
 data.rooms=n;
-
 drawRooms(n);
-
 document.getElementById("details").innerText=roomsText(n);
-
-if(data.type==="mieszkanie") stepBalcony();
-else stepState();
+stepSize();
 }
 
-function chooseBalcony(v){
+function saveSize(){
+data.size=document.getElementById("size").value;
+stepFloor();
+}
+
+function saveFloor(){
+data.floor=document.getElementById("floor").value;
+stepBalcony();
+}
+
+function setBalcony(v){
 data.balcony=v;
 drawBalcony(v);
-stepState();
+stepCondition();
 }
 
-function chooseState(s){
-data.state=s;
-applyState(s);
+function setCondition(c){
+data.condition=c;
+stepLegal();
+}
+
+function setLegal(l){
+data.legal=l;
+applyState();
+stepPhotos();
+}
+
+function savePhotos(e){
+data.photos=e.target.files;
+stepPrice();
+}
+
+function savePrice(){
+data.price=document.getElementById("price").value;
 analyze();
 }
 
-/* ================= TEKST ================= */
+/* ===== UTILS ===== */
 
 function roomsText(n){
-if(n===1) return "1 pokój";
-if(n>=2 && n<=4) return n+" pokoje";
+if(n===1)return"1 pokój";
+if(n<=4)return n+" pokoje";
 return n+" pokoi";
 }
 
-/* ================= UI ================= */
-
-function setContent(html){
+function set(html){
 document.getElementById("content").innerHTML=html;
 }
-
-/* ================= ANIM ================= */
 
 function animate(){
 let svg=document.getElementById("svg");
 svg.classList.remove("draw");
 setTimeout(()=>svg.classList.add("draw"),50);
-}
-
-/* ================= LOGIKA ================= */
-
-function analyze(){
-
-let c=document.getElementById("content");
-
-if(data.state==="problem"||data.state==="renovation"){
-c.innerHTML=`<h1>OD ZERA+</h1><p>Przejmujemy proces od podstaw.</p>`;
-}
-else{
-c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
-}
-
 }
 
 </script>
