@@ -3,25 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>HOMEO+ SPRZEDAŻ+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
+/* ================== DESIGN SYSTEM ================== */
+
+:root {
+    --color-bg-main: #FFFFFF;
+    --color-bg-dark: #1B1C1E;
+    --color-text-main: #000000;
+    --color-text-light: #6F6F6F;
+    --color-accent: #ebdaa8;
+
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 80px;
+
+    --font-hero: 48px;
+    --font-title: 32px;
+    --font-body: 16px;
 }
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background: #1B1C1E;
-    color: white;
-    overflow: hidden;
+    background: var(--color-bg-dark);
+    margin: 0;
 }
 
-/* LAYOUT */
+/* ================== TYPO ================== */
+
+h1 {
+    font-size: var(--font-hero);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+p {
+    font-size: var(--font-body);
+    color: var(--color-text-light);
+}
+
+/* ================== LAYOUT ================== */
 
 .container {
     display: flex;
@@ -30,7 +58,7 @@ body {
 
 .left {
     width: 50%;
-    background: #1B1C1E;
+    background: var(--color-bg-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,78 +66,108 @@ body {
 
 .right {
     width: 50%;
-    background: white;
-    color: black;
-    padding: 80px;
+    background: var(--color-bg-main);
+    padding: var(--space-xl);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-/* TYPO */
+/* ================== SVG VISUAL ================== */
 
-h1 {
-    font-size: 42px;
-    font-weight: 800;
+.visual {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
 }
 
-p {
-    margin-top: 20px;
-    opacity: 0.7;
+svg {
+    width: 100%;
 }
 
-/* BUTTONS */
+/* LINIE */
+
+#propertySVG path,
+#propertySVG rect {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+
+    transition: all 0.6s ease;
+}
+
+/* RYSOWANIE */
+
+.draw path,
+.draw rect {
+    stroke-dashoffset: 0;
+}
+
+/* INFO */
+
+.property-info {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+#propertySize {
+    font-size: 20px;
+    margin-top: 5px;
+}
+
+/* ================== UI ================== */
 
 .button {
-    margin-top: 40px;
+    margin-top: var(--space-lg);
     padding: 18px 32px;
-    background: #ebdaa8;
-    color: black;
-    font-weight: 600;
+    background: var(--color-accent);
     border: none;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
 }
-
-.button:hover {
-    background: black;
-    color: #ebdaa8;
-}
-
-/* OPTIONS */
 
 .option {
+    padding: 18px;
+    border: 1px solid #ddd;
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+.input {
     margin-top: 20px;
     padding: 16px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    transition: 0.2s;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
 }
 
-.option:hover {
-    border-color: black;
+/* ================== MOBILE ================== */
+
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left {
+        width: 100%;
+        height: 40%;
+    }
+
+    .right {
+        width: 100%;
+        height: 60%;
+        padding: var(--space-lg);
+    }
 }
 
-/* VISUAL */
-
-.house {
-    width: 200px;
-    height: 200px;
-    border: 2px solid #ebdaa8;
-    position: relative;
-    opacity: 0;
-    transition: 1s;
-}
-
-.house.active {
-    opacity: 1;
-}
-
-.size {
-    position: absolute;
-    bottom: -40px;
-    color: #ebdaa8;
-}
 </style>
 </head>
 
@@ -117,18 +175,37 @@ p {
 
 <div class="container">
 
-    <!-- LEFT VISUAL -->
+    <!-- LEWA STRONA -->
     <div class="left">
-        <div class="house" id="house">
-            <div class="size" id="size"></div>
+
+        <div class="visual">
+
+            <svg id="propertySVG" viewBox="0 0 400 400">
+
+                <path d="M100 200 L200 120 L300 200 V300 H100 Z" />
+                <path d="M100 200 L200 120 L300 200" />
+
+                <rect x="180" y="240" width="40" height="60" />
+
+                <rect x="130" y="220" width="30" height="30" />
+                <rect x="240" y="220" width="30" height="30" />
+
+            </svg>
+
+            <div class="property-info">
+                <div id="propertyType"></div>
+                <div id="propertySize"></div>
+            </div>
+
         </div>
+
     </div>
 
-    <!-- RIGHT FLOW -->
+    <!-- PRAWA STRONA -->
     <div class="right" id="content">
 
         <h1>SPRZEDAŻ+</h1>
-        <p>Zaczynamy proces sprzedaży Twojej nieruchomości.</p>
+        <p>Zaczynamy sprzedaż Twojej nieruchomości.</p>
 
         <button class="button" onclick="start()">Rozpocznij</button>
 
@@ -138,8 +215,12 @@ p {
 
 <script>
 
+/* ================== STATE ================== */
+
 let step = 0;
 let data = {};
+
+/* ================== FLOW ================== */
 
 function start() {
     nextStep();
@@ -153,25 +234,45 @@ function nextStep() {
     if (step === 1) {
         content.innerHTML = `
             <h1>Co sprzedajesz?</h1>
-            <div class="option" onclick="selectType('mieszkanie')">Mieszkanie</div>
-            <div class="option" onclick="selectType('dom')">Dom</div>
-            <div class="option" onclick="selectType('dzialka')">Działka</div>
+
+            <div class="option" onclick="selectType('Mieszkanie')">Mieszkanie</div>
+            <div class="option" onclick="selectType('Dom')">Dom</div>
+            <div class="option" onclick="selectType('Działka')">Działka</div>
         `;
     }
 
     if (step === 2) {
         content.innerHTML = `
             <h1>Podaj metraż</h1>
-            <input type="number" id="sizeInput" placeholder="np. 75" style="padding:15px; margin-top:20px;">
+
+            <input class="input" type="number" id="sizeInput" placeholder="np. 75">
+
             <button class="button" onclick="saveSize()">Dalej</button>
         `;
     }
 }
 
+/* ================== VISUAL ================== */
+
+function drawProperty() {
+    document.getElementById("propertySVG").classList.add("draw");
+}
+
+function setType(type) {
+    document.getElementById("propertyType").innerText = type.toUpperCase() + "+";
+}
+
+function setSize(size) {
+    document.getElementById("propertySize").innerText = size + " m²";
+}
+
+/* ================== ACTIONS ================== */
+
 function selectType(type) {
     data.type = type;
 
-    document.getElementById("house").classList.add("active");
+    setType(type);
+    drawProperty();
 
     nextStep();
 }
@@ -179,11 +280,14 @@ function selectType(type) {
 function saveSize() {
     const size = document.getElementById("sizeInput").value;
 
-    if (!size) return alert("Podaj metraż");
+    if (!size) {
+        alert("Podaj metraż");
+        return;
+    }
 
     data.size = size;
 
-    document.getElementById("size").innerText = size + " m²";
+    setSize(size);
 
     nextStep();
 }
