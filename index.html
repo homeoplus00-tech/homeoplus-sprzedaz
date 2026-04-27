@@ -20,33 +20,54 @@ color:white;
 /* LAYOUT */
 
 .container{
+display:flex;
 height:100vh;
+}
+
+.left{
+width:50%;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-text-align:center;
+}
+
+.right{
+width:50%;
+background:#0f1113;
+padding:80px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+.container{flex-direction:column;}
+.left{height:40%;width:100%;}
+.right{height:60%;width:100%;padding:30px;}
 }
 
 /* TYPO */
 
 h1{
-font-size:42px;
+font-size:38px;
 font-weight:800;
 margin-bottom:20px;
 }
 
 p{
 opacity:0.6;
+margin-bottom:30px;
 }
 
 /* OPTIONS */
 
 .option{
 border:1px solid rgba(255,255,255,0.2);
-padding:14px 20px;
-margin:10px auto;
-width:260px;
+padding:14px 18px;
+margin-top:10px;
 cursor:pointer;
 transition:0.25s;
 }
@@ -59,18 +80,19 @@ color:#ebdaa8;
 /* SVG */
 
 svg{
-width:260px;
-margin:40px auto;
+width:280px;
+margin-bottom:40px;
 }
 
 svg path, svg rect, svg line{
 fill:none;
 stroke:#ebdaa8;
 stroke-width:2;
+stroke-linecap:round;
 
 stroke-dasharray:400;
 stroke-dashoffset:400;
-transition:0.8s;
+transition:0.6s;
 }
 
 .draw path, .draw rect, .draw line{
@@ -88,10 +110,9 @@ stroke-dasharray:6;
 opacity:0.4;
 }
 
-/* INFO */
+/* KARTA */
 
 .card{
-margin-top:20px;
 color:#ebdaa8;
 }
 
@@ -113,6 +134,10 @@ font-size:14px;
 
 <div class="container">
 
+<!-- LEFT -->
+
+<div class="left">
+
 <svg id="svg" viewBox="0 0 400 400"></svg>
 
 <div class="card">
@@ -120,7 +145,11 @@ font-size:14px;
 <span id="details"></span>
 </div>
 
-<div id="content"></div>
+</div>
+
+<!-- RIGHT -->
+
+<div class="right" id="content"></div>
 
 </div>
 
@@ -136,17 +165,10 @@ let stepIndex = 0;
 
 start();
 
-/* ===== FLOW ===== */
-
 function start(){
-stepType();
-}
-
-/* TYPE */
-
-function stepType(){
 set(`
-<h1>Co sprzedajesz?</h1>
+<h1>Zajmujemy się sprzedażą Twojej nieruchomości</h1>
+<p>Wybierz typ — przeprowadzimy Cię przez cały proces.</p>
 
 <div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
 <div class="option" onclick="chooseType('dom')">Dom</div>
@@ -156,19 +178,7 @@ set(`
 `);
 }
 
-/* FLOW ENGINE */
-
-function next(){
-stepIndex++;
-
-if(stepIndex < flow.length){
-flow[stepIndex]();
-}else{
-analyze();
-}
-}
-
-/* ===== FLOWS ===== */
+/* ===== FLOW DEFINICJE ===== */
 
 const flows = {
 
@@ -197,18 +207,34 @@ stepState
 
 };
 
+/* ===== FLOW CONTROL ===== */
+
+function next(){
+stepIndex++;
+
+if(stepIndex < flow.length){
+flow[stepIndex]();
+}else{
+analyze();
+}
+}
+
 /* ===== STEPS ===== */
 
 function stepRooms(){
 set(`
-<h1>Liczba pokoi</h1>
+<h1>Określamy układ nieruchomości</h1>
+<p>Ile pomieszczeń ma Twoja nieruchomość?</p>
+
 ${[1,2,3,4,5].map(n=>`<div class="option" onclick="setRooms(${n})">${n===5?"5+":n}</div>`).join("")}
 `);
 }
 
 function stepBalcony(){
 set(`
-<h1>Balkon</h1>
+<h1>Sprawdzamy potencjał przestrzeni</h1>
+<p>Czy nieruchomość posiada balkon?</p>
+
 <div class="option" onclick="setBalcony(true)">Tak</div>
 <div class="option" onclick="setBalcony(false)">Nie</div>
 `);
@@ -216,12 +242,12 @@ set(`
 
 function stepState(){
 set(`
-<h1>Stan nieruchomości</h1>
+<h1>Analizujemy stan nieruchomości</h1>
 
-<div class="option" onclick="setState('ideal')">Gotowa</div>
-<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
-<div class="option" onclick="setState('renovation')">Do remontu</div>
-<div class="option" onclick="setState('problem')">Problem</div>
+<div class="option" onclick="setState('ideal')">Gotowa do sprzedaży</div>
+<div class="option" onclick="setState('refresh')">Wymaga odświeżenia</div>
+<div class="option" onclick="setState('renovation')">Wymaga remontu</div>
+<div class="option" onclick="setState('problem')">Problemy prawne / trudna</div>
 `);
 }
 
@@ -256,35 +282,26 @@ svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
 animate();
 }
 
-/* ROOMS (PLAN) */
+/* ===== REAKCJE SVG ===== */
 
 function drawRooms(n){
-
-if(data.type!=="mieszkanie") return;
 
 let svg=document.getElementById("svg");
 
 svg.querySelectorAll(".room").forEach(e=>e.remove());
 
-if(n>=2)addLine(200,120,200,320);
-if(n>=3)addLine(100,220,200,220);
-if(n>=4)addLine(200,220,300,220);
-if(n>=5)addLine(150,120,150,320);
+for(let i=1;i<n;i++){
+let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+l.setAttribute("x1",100+(i*(200/n)));
+l.setAttribute("y1",120);
+l.setAttribute("x2",100+(i*(200/n)));
+l.setAttribute("y2",320);
+l.setAttribute("class","room");
+svg.appendChild(l);
+}
 
 animate();
 }
-
-function addLine(x1,y1,x2,y2){
-let l=document.createElementNS("http://www.w3.org/2000/svg","line");
-l.setAttribute("x1",x1);
-l.setAttribute("y1",y1);
-l.setAttribute("x2",x2);
-l.setAttribute("y2",y2);
-l.setAttribute("class","room");
-document.getElementById("svg").appendChild(l);
-}
-
-/* BALKON */
 
 function drawBalcony(v){
 
@@ -306,8 +323,6 @@ svg.appendChild(b);
 animate();
 }
 
-/* STAN */
-
 function applyState(s){
 
 let svg=document.getElementById("svg");
@@ -325,7 +340,7 @@ data.type=t;
 
 drawBase(t);
 
-document.getElementById("type").innerText=t;
+document.getElementById("type").innerText=t.toUpperCase();
 
 flow = flows[t];
 stepIndex = 0;
@@ -381,7 +396,7 @@ function analyze(){
 
 set(`
 <h1>${data.state==="problem"||data.state==="renovation"?"OD ZERA+":"SPRZEDAŻ+"}</h1>
-<p>${data.state==="problem"?"Przejmujemy wszystko od podstaw":"Gotowe do sprzedaży"}</p>
+<p>${data.state==="problem"?"Przejmujemy wszystko od podstaw":"Gotowe do sprzedaży — przechodzimy dalej."}</p>
 `);
 
 }
