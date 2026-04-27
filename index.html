@@ -9,44 +9,59 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-body{margin:0;font-family:Montserrat;background:#1B1C1E;}
-.container{display:flex;height:100vh;}
 
-.left{
-width:50%;
+body{
+margin:0;
+font-family:Montserrat;
+background:#0f1113;
+color:white;
+}
+
+/* LAYOUT */
+
+.container{
+height:100vh;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
+text-align:center;
 }
 
-.right{
-width:50%;
-background:white;
-padding:80px;
-display:flex;
-flex-direction:column;
-justify-content:center;
+/* TYPO */
+
+h1{
+font-size:42px;
+font-weight:800;
+margin-bottom:20px;
 }
 
-@media(max-width:900px){
-.container{flex-direction:column;}
-.left{height:40%;width:100%;}
-.right{height:60%;width:100%;padding:30px;}
+p{
+opacity:0.6;
 }
 
-h1{font-size:38px;font-weight:800;}
+/* OPTIONS */
 
 .option{
-border:1px solid #ddd;
-padding:14px;
-margin-top:10px;
+border:1px solid rgba(255,255,255,0.2);
+padding:14px 20px;
+margin:10px auto;
+width:260px;
 cursor:pointer;
+transition:0.25s;
 }
 
-.option:hover{border-color:black;}
+.option:hover{
+border-color:#ebdaa8;
+color:#ebdaa8;
+}
 
-svg{width:300px;margin-bottom:40px;}
+/* SVG */
+
+svg{
+width:260px;
+margin:40px auto;
+}
 
 svg path, svg rect, svg line{
 fill:none;
@@ -62,9 +77,34 @@ transition:0.8s;
 stroke-dashoffset:0;
 }
 
-.card{color:#ebdaa8;}
-.card strong{font-weight:800;}
-.card span{opacity:0.8;}
+/* STANY */
+
+.problem *{
+stroke:red !important;
+stroke-dasharray:6;
+}
+
+.refresh *{
+opacity:0.4;
+}
+
+/* INFO */
+
+.card{
+margin-top:20px;
+color:#ebdaa8;
+}
+
+.card strong{
+display:block;
+font-weight:800;
+margin-bottom:5px;
+}
+
+.card span{
+opacity:0.7;
+font-size:14px;
+}
 
 </style>
 </head>
@@ -73,31 +113,62 @@ stroke-dashoffset:0;
 
 <div class="container">
 
-<div class="left">
 <svg id="svg" viewBox="0 0 400 400"></svg>
 
 <div class="card">
 <strong id="type"></strong>
 <span id="details"></span>
 </div>
-</div>
 
-<div class="right" id="content">
-<h1>SPRZEDAŻ+</h1>
-<div class="option" onclick="start()">Start</div>
-</div>
+<div id="content"></div>
 
 </div>
 
 <script>
 
-/* ================= ENGINE ================= */
+/* ===== STATE ===== */
 
 let data = {};
 let flow = [];
 let stepIndex = 0;
 
-/* ================= FLOWS ================= */
+/* ===== START ===== */
+
+start();
+
+/* ===== FLOW ===== */
+
+function start(){
+stepType();
+}
+
+/* TYPE */
+
+function stepType(){
+set(`
+<h1>Co sprzedajesz?</h1>
+
+<div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
+<div class="option" onclick="chooseType('dom')">Dom</div>
+<div class="option" onclick="chooseType('lokal')">Lokal usługowy</div>
+<div class="option" onclick="chooseType('hala')">Magazyn / hala</div>
+<div class="option" onclick="chooseType('dzialka')">Działka</div>
+`);
+}
+
+/* FLOW ENGINE */
+
+function next(){
+stepIndex++;
+
+if(stepIndex < flow.length){
+flow[stepIndex]();
+}else{
+analyze();
+}
+}
+
+/* ===== FLOWS ===== */
 
 const flows = {
 
@@ -126,39 +197,7 @@ stepState
 
 };
 
-/* ================= START ================= */
-
-function start(){
-stepType();
-}
-
-/* ================= TYPE ================= */
-
-function stepType(){
-set(`
-<h1>Typ nieruchomości</h1>
-
-<div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
-<div class="option" onclick="chooseType('dom')">Dom</div>
-<div class="option" onclick="chooseType('lokal')">Lokal usługowy</div>
-<div class="option" onclick="chooseType('hala')">Magazyn / hala</div>
-<div class="option" onclick="chooseType('dzialka')">Działka</div>
-`);
-}
-
-/* ================= FLOW CONTROL ================= */
-
-function next(){
-stepIndex++;
-
-if(stepIndex < flow.length){
-flow[stepIndex]();
-}else{
-analyze();
-}
-}
-
-/* ================= STEPS ================= */
+/* ===== STEPS ===== */
 
 function stepRooms(){
 set(`
@@ -182,16 +221,17 @@ set(`
 <div class="option" onclick="setState('ideal')">Gotowa</div>
 <div class="option" onclick="setState('refresh')">Do odświeżenia</div>
 <div class="option" onclick="setState('renovation')">Do remontu</div>
-<div class="option" onclick="setState('problem')">Problemy</div>
+<div class="option" onclick="setState('problem')">Problem</div>
 `);
 }
 
-/* ================= SVG ================= */
+/* ===== SVG ===== */
 
 function drawBase(type){
 
 let svg=document.getElementById("svg");
 svg.innerHTML="";
+svg.className="";
 
 if(type==="mieszkanie"){
 svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
@@ -215,6 +255,8 @@ svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
 
 animate();
 }
+
+/* ROOMS (PLAN) */
 
 function drawRooms(n){
 
@@ -242,6 +284,8 @@ l.setAttribute("class","room");
 document.getElementById("svg").appendChild(l);
 }
 
+/* BALKON */
+
 function drawBalcony(v){
 
 let svg=document.getElementById("svg");
@@ -262,7 +306,18 @@ svg.appendChild(b);
 animate();
 }
 
-/* ================= ACTIONS ================= */
+/* STAN */
+
+function applyState(s){
+
+let svg=document.getElementById("svg");
+svg.className="";
+
+if(s==="problem") svg.classList.add("problem");
+if(s==="refresh") svg.classList.add("refresh");
+}
+
+/* ===== ACTIONS ===== */
 
 function chooseType(t){
 data={};
@@ -293,10 +348,11 @@ next();
 
 function setState(s){
 data.state=s;
+applyState(s);
 next();
 }
 
-/* ================= UI ================= */
+/* ===== UI ===== */
 
 function set(html){
 document.getElementById("content").innerHTML=html;
@@ -311,7 +367,7 @@ data.rooms+" pokoi");
 }
 }
 
-/* ================= ANIM ================= */
+/* ===== ANIM ===== */
 
 function animate(){
 let svg=document.getElementById("svg");
@@ -319,17 +375,14 @@ svg.classList.remove("draw");
 setTimeout(()=>svg.classList.add("draw"),50);
 }
 
-/* ================= ANALIZA ================= */
+/* ===== ANALIZA ===== */
 
 function analyze(){
 
-let c=document.getElementById("content");
-
-if(data.state==="problem"||data.state==="renovation"){
-c.innerHTML=`<h1>OD ZERA+</h1><p>Przejmujemy proces od podstaw.</p>`;
-}else{
-c.innerHTML=`<h1>SPRZEDAŻ+</h1><p>Gotowe do sprzedaży.</p>`;
-}
+set(`
+<h1>${data.state==="problem"||data.state==="renovation"?"OD ZERA+":"SPRZEDAŻ+"}</h1>
+<p>${data.state==="problem"?"Przejmujemy wszystko od podstaw":"Gotowe do sprzedaży"}</p>
+`);
 
 }
 
