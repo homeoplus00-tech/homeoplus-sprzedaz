@@ -1,9 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-  <title>Homeo+ Sprzedaż</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homeo+ Konsultacja</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+
+body{
+  background: linear-gradient(135deg,#0a0a0a,#111);
+  color:white;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.container{
+  width:420px;
+  max-width:90%;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:40px;
+  box-shadow:0 0 40px rgba(0,0,0,0.5);
+  position:relative;
+  overflow:hidden;
+}
+
+.step{
+  position:absolute;
+  width:100%;
+  left:0;
+  top:0;
+  opacity:0;
+  transform:translateX(100%);
+  transition:all .6s ease;
+}
+
+.step.active{
+  opacity:1;
+  transform:translateX(0);
+  position:relative;
+}
+
+h2{
+  margin-bottom:20px;
+  font-weight:600;
+}
+
+input, textarea{
+  width:100%;
+  padding:15px;
+  margin-bottom:20px;
+  border:none;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  color:white;
+  outline:none;
+  transition:0.3s;
+}
+
+input:focus, textarea:focus{
+  background:rgba(255,255,255,0.15);
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00c6ff,#0072ff);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+.progress{
+  height:4px;
+  background:#333;
+  margin-bottom:25px;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:33%;
+  background:linear-gradient(45deg,#00c6ff,#0072ff);
+  transition:0.5s;
+}
+</style>
 </head>
-<body style="background:black;color:white;text-align:center;padding-top:100px;">
-  <h1>Sprzedaż działa 🚀</h1>
+
+<body>
+
+<div class="container">
+
+<div class="progress">
+  <div class="progress-bar" id="progress"></div>
+</div>
+
+<div class="step active">
+  <h2>Jak masz na imię?</h2>
+  <input type="text" id="name" placeholder="Imię">
+  <button onclick="nextStep()">Dalej</button>
+</div>
+
+<div class="step">
+  <h2>Podaj email</h2>
+  <input type="email" id="email" placeholder="Email">
+  <button onclick="nextStep()">Dalej</button>
+</div>
+
+<div class="step">
+  <h2>Opisz problem</h2>
+  <textarea id="msg" placeholder="Twoja sytuacja..."></textarea>
+  <button onclick="submitForm()">Wyślij</button>
+</div>
+
+<div class="step">
+  <h2>Dziękujemy! 🚀</h2>
+  <p>Skontaktujemy się z Tobą wkrótce.</p>
+</div>
+
+</div>
+
+<script>
+let current = 0;
+const steps = document.querySelectorAll(".step");
+const progress = document.getElementById("progress");
+
+function nextStep(){
+  if(current < steps.length -1){
+    steps[current].classList.remove("active");
+    current++;
+    steps[current].classList.add("active");
+    progress.style.width = ((current+1)/steps.length)*100 + "%";
+  }
+}
+
+function submitForm(){
+  const data = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    msg: document.getElementById("msg").value
+  };
+
+  console.log(data);
+
+  nextStep();
+}
+</script>
+
 </body>
 </html>
