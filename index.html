@@ -1,181 +1,267 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOMEO+ SPRZEDAŻ+</title>
+<section class="homeo-experience">
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+<div class="progress-bar"></div>
+
+<div class="experience-container">
+
+  <!-- VISUAL (DOM) -->
+  <div class="visual">
+    <div class="house" id="house">
+      <div class="roof"></div>
+      <div class="body"></div>
+      <div class="door"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="narration" id="narration">
+      Zaczynamy proces sprzedaży.
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step active">
+      <h1>SPRZEDAŻ<span>+</span></h1>
+      <p>To nie formularz. To system sprzedaży Twojej nieruchomości.</p>
+      <button onclick="next()">Rozpocznij</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <h2>Co sprzedajesz?</h2>
+      <div class="options">
+        <div onclick="selectType('Mieszkanie')">Mieszkanie</div>
+        <div onclick="selectType('Dom')">Dom</div>
+        <div onclick="selectType('Działka')">Działka</div>
+        <div onclick="selectType('Lokal')">Lokal</div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <h2>Stan nieruchomości</h2>
+      <div class="options">
+        <div onclick="selectState('clean')">Gotowa</div>
+        <div onclick="selectState('medium')">Do poprawy</div>
+        <div onclick="selectState('problem')">Problemy</div>
+      </div>
+    </div>
+
+    <!-- STEP OD ZERA -->
+    <div class="step" id="zero">
+      <h2>OD ZERA<span>+</span></h2>
+      <p>Przejmujemy wszystko: prawo, remont, przygotowanie.</p>
+      <button onclick="next()">Przejdź dalej</button>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <h2>Metraż</h2>
+      <input type="number" id="area" placeholder="np. 65">
+      <button onclick="next()">Dalej</button>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <h2>Lokalizacja</h2>
+      <input type="text" id="city" placeholder="Miasto">
+      <button onclick="next()">Dalej</button>
+    </div>
+
+    <!-- STEP FINAL -->
+    <div class="step">
+      <h2>Gotowe</h2>
+      <p id="summary"></p>
+      <button onclick="submit()">Wyślij</button>
+    </div>
+
+  </div>
+</div>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Montserrat', sans-serif;
+.homeo-experience{
+  height:100vh;
+  display:flex;
+  background:#1B1C1E;
+  color:#fff;
+  font-family:'Montserrat',sans-serif;
 }
 
-body {
-  background: #fff;
-  color: #1B1C1E;
-  overflow: hidden;
+.progress-bar{
+  position:fixed;
+  top:0;
+  left:0;
+  height:3px;
+  width:0%;
+  background:#ebdaa8;
+  transition:0.4s;
 }
 
-.section {
-  height: 100vh;
-  width: 100%;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 40px;
-  text-align: center;
-  transition: opacity 0.6s ease;
+.experience-container{
+  display:flex;
+  width:100%;
 }
 
-.section.active {
-  display: flex;
-  animation: fadeIn 0.6s ease;
+/* LEFT VISUAL */
+.visual{
+  width:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-h1 {
-  font-size: 42px;
-  font-weight: 800;
-  margin-bottom: 20px;
+.house{
+  width:120px;
+  height:120px;
+  position:relative;
+  opacity:0.2;
+  transition:0.6s;
 }
 
-p {
-  font-size: 18px;
-  max-width: 600px;
-  opacity: 0.7;
-  margin-bottom: 40px;
+.house.active{
+  opacity:1;
+  transform:scale(1.1);
 }
 
-.options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+.roof{
+  width:0;
+  height:0;
+  border-left:60px solid transparent;
+  border-right:60px solid transparent;
+  border-bottom:50px solid #ebdaa8;
 }
 
-.option {
-  border: 1px solid #1B1C1E;
-  padding: 14px 24px;
-  cursor: pointer;
-  transition: 0.3s;
+.body{
+  width:120px;
+  height:80px;
+  background:#ebdaa8;
 }
 
-.option:hover {
-  background: #1B1C1E;
-  color: #fff;
-  transform: scale(1.05);
+.door{
+  width:25px;
+  height:40px;
+  background:#1B1C1E;
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
 }
 
-.progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 4px;
-  background: #ebdaa8;
-  width: 0%;
-  transition: width 0.4s ease;
+/* RIGHT CONTENT */
+.content{
+  width:50%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
-input {
-  padding: 15px;
-  border: none;
-  border-bottom: 1px solid #1B1C1E;
-  width: 300px;
-  font-size: 16px;
-  outline: none;
+.narration{
+  position:absolute;
+  top:40px;
+  opacity:0.5;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity: 1; transform: translateY(0);}
+.step{display:none;text-align:center;}
+.step.active{display:block;animation:fade 0.5s;}
+
+.options div{
+  border:1px solid #ebdaa8;
+  padding:15px;
+  margin:10px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.options div:hover{
+  background:#ebdaa8;
+  color:#000;
+}
+
+input{
+  padding:12px;
+  margin:20px;
+  border:none;
+  border-bottom:1px solid #fff;
+  background:transparent;
+  color:#fff;
+}
+
+button{
+  padding:12px 25px;
+  border:1px solid #ebdaa8;
+  background:none;
+  color:#ebdaa8;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#ebdaa8;
+  color:#000;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;}
 }
 </style>
-</head>
-
-<body>
-
-<div class="progress" id="progress"></div>
-
-<!-- STEP 1 -->
-<div class="section active">
-  <h1>SPRZEDAŻ<span style="font-weight:800;">+</span></h1>
-  <p>To nie jest formularz. To proces sprzedaży Twojej nieruchomości.</p>
-  <div class="option" onclick="next()">Rozpocznij</div>
-</div>
-
-<!-- STEP 2 -->
-<div class="section">
-  <h1>Co sprzedajesz?</h1>
-  <div class="options">
-    <div class="option" onclick="next()">Mieszkanie</div>
-    <div class="option" onclick="next()">Dom</div>
-    <div class="option" onclick="next()">Działka</div>
-    <div class="option" onclick="next()">Inwestycja</div>
-  </div>
-</div>
-
-<!-- STEP 3 -->
-<div class="section">
-  <h1>Gdzie znajduje się nieruchomość?</h1>
-  <input type="text" placeholder="Miasto / Lokalizacja">
-  <br><br>
-  <div class="option" onclick="next()">Dalej</div>
-</div>
-
-<!-- STEP 4 -->
-<div class="section">
-  <h1>Stan nieruchomości</h1>
-  <div class="options">
-    <div class="option" onclick="next()">Gotowa do sprzedaży</div>
-    <div class="option" onclick="triggerZero()">Wymaga pracy</div>
-    <div class="option" onclick="triggerZero()">Problemy prawne</div>
-  </div>
-</div>
-
-<!-- STEP 5 (OD ZERA+) -->
-<div class="section" id="zero">
-  <h1>OD ZERA<span style="font-weight:800;">+</span></h1>
-  <p>Zajmiemy się wszystkim. Od problemów prawnych po przygotowanie nieruchomości.</p>
-  <div class="option" onclick="next()">Kontynuuj</div>
-</div>
-
-<!-- STEP FINAL -->
-<div class="section">
-  <h1>Twoja sprzedaż zaczyna się teraz</h1>
-  <p>
-  Otrzymasz dostęp do aplikacji, w której monitorujesz każdy etap sprzedaży.
-  </p>
-  <div class="option">Zakończ i przejdź dalej</div>
-</div>
 
 <script>
-let current = 0;
-const sections = document.querySelectorAll('.section');
-const progress = document.getElementById('progress');
+let step = 0;
+let type = "";
+let state = "";
 
-function updateProgress() {
-  progress.style.width = ((current) / (sections.length - 1)) * 100 + '%';
+const steps = document.querySelectorAll(".step");
+const narration = document.getElementById("narration");
+const house = document.getElementById("house");
+const progress = document.querySelector(".progress-bar");
+
+function update(){
+  steps.forEach(s=>s.classList.remove("active"));
+  steps[step].classList.add("active");
+
+  progress.style.width = ((step)/(steps.length-1))*100+"%";
+
+  house.classList.add("active");
+
+  // NARRACJA
+  if(step===1) narration.innerText="Określamy typ nieruchomości";
+  if(step===2) narration.innerText="Analizujemy stan";
+  if(step===3) narration.innerText="Dostosowujemy strategię";
+  if(step===4) narration.innerText="Precyzujemy szczegóły";
+  if(step===5) narration.innerText="Finalizujemy proces";
 }
 
-function next() {
-  sections[current].classList.remove('active');
-  current++;
-  sections[current].classList.add('active');
-  updateProgress();
+function next(){
+  step++;
+  update();
 }
 
-function triggerZero() {
-  sections[current].classList.remove('active');
-  current = 4; // index OD ZERA+
-  sections[current].classList.add('active');
-  updateProgress();
+function selectType(t){
+  type=t;
+  next();
 }
+
+function selectState(s){
+  state=s;
+
+  if(state==="problem"){
+    step=3; // OD ZERA
+  } else {
+    step++;
+  }
+  update();
+}
+
+function submit(){
+  document.getElementById("summary").innerText =
+    `Sprzedajesz ${type} w ${city.value}, ${area.value}m²`;
+
+  alert("Wysłano");
+}
+
+update();
 </script>
 
-</body>
-</html>
+</section>
