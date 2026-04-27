@@ -3,148 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homeo+ Experience</title>
+<title>HOMEO+ SPRZEDAŻ+</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-
-body{
-  background:#000;
-  color:white;
-  overflow:hidden;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
 }
 
-.screen{
-  position:absolute;
-  width:100%;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:40px;
-  transition:all .8s ease;
-  opacity:0;
-  transform:translateY(40px);
+body {
+  background: #fff;
+  color: #1B1C1E;
+  overflow: hidden;
 }
 
-.screen.active{
-  opacity:1;
-  transform:translateY(0);
+.section {
+  height: 100vh;
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 40px;
+  text-align: center;
+  transition: opacity 0.6s ease;
 }
 
-h1{
-  font-size:clamp(28px,5vw,48px);
-  font-weight:600;
-  margin-bottom:20px;
+.section.active {
+  display: flex;
+  animation: fadeIn 0.6s ease;
 }
 
-p{
-  opacity:0.7;
-  margin-bottom:40px;
+h1 {
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
-button{
-  padding:15px 30px;
-  border:none;
-  border-radius:30px;
-  background:white;
-  color:black;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.3s;
+p {
+  font-size: 18px;
+  max-width: 600px;
+  opacity: 0.7;
+  margin-bottom: 40px;
 }
 
-button:hover{
-  transform:scale(1.05);
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
-.options{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  justify-content:center;
+.option {
+  border: 1px solid #1B1C1E;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.option{
-  padding:15px 25px;
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:30px;
-  cursor:pointer;
-  transition:0.3s;
+.option:hover {
+  background: #1B1C1E;
+  color: #fff;
+  transform: scale(1.05);
 }
 
-.option:hover{
-  background:white;
-  color:black;
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: #ebdaa8;
+  width: 0%;
+  transition: width 0.4s ease;
 }
 
-input{
-  padding:15px;
-  border:none;
-  border-radius:10px;
-  width:300px;
-  max-width:90%;
+input {
+  padding: 15px;
+  border: none;
+  border-bottom: 1px solid #1B1C1E;
+  width: 300px;
+  font-size: 16px;
+  outline: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="screen active">
-  <h1>Sprzedaj nieruchomość mądrzej</h1>
-  <p>System Homeo+ analizuje Twój potencjał sprzedaży</p>
-  <button onclick="next()">Rozpocznij</button>
+<div class="progress" id="progress"></div>
+
+<!-- STEP 1 -->
+<div class="section active">
+  <h1>SPRZEDAŻ<span style="font-weight:800;">+</span></h1>
+  <p>To nie jest formularz. To proces sprzedaży Twojej nieruchomości.</p>
+  <div class="option" onclick="next()">Rozpocznij</div>
 </div>
 
-<div class="screen">
+<!-- STEP 2 -->
+<div class="section">
   <h1>Co sprzedajesz?</h1>
   <div class="options">
-    <div class="option" onclick="select('mieszkanie')">Mieszkanie</div>
-    <div class="option" onclick="select('dom')">Dom</div>
-    <div class="option" onclick="select('dzialka')">Działka</div>
+    <div class="option" onclick="next()">Mieszkanie</div>
+    <div class="option" onclick="next()">Dom</div>
+    <div class="option" onclick="next()">Działka</div>
+    <div class="option" onclick="next()">Inwestycja</div>
   </div>
 </div>
 
-<div class="screen">
-  <h1>Dlaczego sprzedajesz?</h1>
-  <div class="options">
-    <div class="option" onclick="select('szybko')">Chcę sprzedać szybko</div>
-    <div class="option" onclick="select('max')">Chcę max ceny</div>
-    <div class="option" onclick="select('inwestycja')">Zmiana inwestycji</div>
-  </div>
-</div>
-
-<div class="screen">
-  <h1>Analiza gotowa</h1>
-  <p>Twoja nieruchomość ma wysoki potencjał sprzedaży</p>
-  <button onclick="next()">Zobacz wynik</button>
-</div>
-
-<div class="screen">
-  <h1>Ostatni krok</h1>
-  <p>Podaj email, a przygotujemy dokładną wycenę</p>
-  <input type="email" placeholder="Twój email">
+<!-- STEP 3 -->
+<div class="section">
+  <h1>Gdzie znajduje się nieruchomość?</h1>
+  <input type="text" placeholder="Miasto / Lokalizacja">
   <br><br>
-  <button>Odbierz analizę</button>
+  <div class="option" onclick="next()">Dalej</div>
+</div>
+
+<!-- STEP 4 -->
+<div class="section">
+  <h1>Stan nieruchomości</h1>
+  <div class="options">
+    <div class="option" onclick="next()">Gotowa do sprzedaży</div>
+    <div class="option" onclick="triggerZero()">Wymaga pracy</div>
+    <div class="option" onclick="triggerZero()">Problemy prawne</div>
+  </div>
+</div>
+
+<!-- STEP 5 (OD ZERA+) -->
+<div class="section" id="zero">
+  <h1>OD ZERA<span style="font-weight:800;">+</span></h1>
+  <p>Zajmiemy się wszystkim. Od problemów prawnych po przygotowanie nieruchomości.</p>
+  <div class="option" onclick="next()">Kontynuuj</div>
+</div>
+
+<!-- STEP FINAL -->
+<div class="section">
+  <h1>Twoja sprzedaż zaczyna się teraz</h1>
+  <p>
+  Otrzymasz dostęp do aplikacji, w której monitorujesz każdy etap sprzedaży.
+  </p>
+  <div class="option">Zakończ i przejdź dalej</div>
 </div>
 
 <script>
 let current = 0;
-const screens = document.querySelectorAll(".screen");
+const sections = document.querySelectorAll('.section');
+const progress = document.getElementById('progress');
 
-function next(){
-  screens[current].classList.remove("active");
-  current++;
-  screens[current].classList.add("active");
+function updateProgress() {
+  progress.style.width = ((current) / (sections.length - 1)) * 100 + '%';
 }
 
-function select(val){
-  console.log("wybór:", val);
-  next();
+function next() {
+  sections[current].classList.remove('active');
+  current++;
+  sections[current].classList.add('active');
+  updateProgress();
+}
+
+function triggerZero() {
+  sections[current].classList.remove('active');
+  current = 4; // index OD ZERA+
+  sections[current].classList.add('active');
+  updateProgress();
 }
 </script>
 
