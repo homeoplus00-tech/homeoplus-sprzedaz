@@ -4,25 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SPRZEDAŻ+</title>
+<title>HOMEO+ SPRZEDAŻ+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 
-/* ================= DESIGN SYSTEM ================= */
+/* ===== DESIGN ===== */
 
 :root {
     --color-bg-main: #FFFFFF;
     --color-bg-dark: #1B1C1E;
     --color-text-light: #6F6F6F;
     --color-accent: #ebdaa8;
-
-    --space-lg: 40px;
-    --space-xl: 80px;
 }
-
-/* ================= BASE ================= */
 
 body {
     margin: 0;
@@ -30,7 +25,7 @@ body {
     background: var(--color-bg-dark);
 }
 
-/* ================= LAYOUT ================= */
+/* ===== LAYOUT ===== */
 
 .container {
     display: flex;
@@ -47,57 +42,35 @@ body {
 .right {
     width: 50%;
     background: white;
-    padding: var(--space-xl);
+    padding: 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-/* ================= MOBILE ================= */
-
 @media (max-width: 900px) {
-    .container {
-        flex-direction: column;
-    }
-
-    .left {
-        width: 100%;
-        height: 40%;
-    }
-
-    .right {
-        width: 100%;
-        height: 60%;
-        padding: var(--space-lg);
-    }
+    .container { flex-direction: column; }
+    .left { height: 40%; width: 100%; }
+    .right { height: 60%; width: 100%; padding: 30px; }
 }
 
-/* ================= TYPO ================= */
+/* ===== UI ===== */
 
-h1 {
-    font-size: 42px;
-    font-weight: 800;
-}
-
-p {
-    color: var(--color-text-light);
-}
-
-/* ================= UI ================= */
-
-.button {
-    margin-top: 30px;
-    padding: 16px 28px;
-    background: var(--color-accent);
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-}
+h1 { font-size: 42px; font-weight: 800; }
+p { color: var(--color-text-light); }
 
 .option {
     padding: 16px;
     border: 1px solid #ddd;
     margin-top: 15px;
+    cursor: pointer;
+}
+
+.button {
+    margin-top: 25px;
+    padding: 14px 24px;
+    background: var(--color-accent);
+    border: none;
     cursor: pointer;
 }
 
@@ -109,21 +82,22 @@ p {
     border-bottom: 1px solid #ccc;
 }
 
-/* ================= SVG ================= */
+/* ===== SVG ===== */
 
 .visual {
     position: relative;
-    width: 100%;
-    max-width: 320px;
+    width: 320px;
 }
 
 #propertySVG {
     width: 100%;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: 0.4s;
 }
 
-/* LINIE */
+#propertySVG.active {
+    opacity: 1;
+}
 
 #propertySVG path,
 #propertySVG rect,
@@ -138,12 +112,6 @@ p {
     transition: stroke-dashoffset 0.8s ease;
 }
 
-/* RYSOWANIE */
-
-#propertySVG.active {
-    opacity: 1;
-}
-
 #propertySVG.draw path,
 #propertySVG.draw rect,
 #propertySVG.draw line {
@@ -154,14 +122,9 @@ p {
 
 .property-info {
     position: absolute;
-    bottom: -60px;
-    left: 0;
+    bottom: -80px;
     color: var(--color-accent);
     font-weight: 600;
-}
-
-#propertySize {
-    margin-top: 5px;
 }
 
 </style>
@@ -171,7 +134,7 @@ p {
 
 <div class="container">
 
-<!-- ================= LEWA ================= -->
+<!-- LEFT -->
 
 <div class="left">
 
@@ -179,34 +142,40 @@ p {
 
 <svg id="propertySVG" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
 
-<!-- KSZTAŁT -->
+<!-- BASE -->
+<path id="mainShape"></path>
 
-<path id="shape1"></path>
-<path id="shape2"></path>
-<rect id="shape3"></rect>
-<rect id="shape4"></rect>
-<rect id="shape5"></rect>
-<line id="shape6"></line>
+<!-- OKNA -->
+<rect id="room1"></rect>
+<rect id="room2"></rect>
+<rect id="room3"></rect>
+
+<!-- BALKON -->
+<rect id="balcony"></rect>
+
+<!-- PIĘTRO -->
+<line id="floorLine"></line>
 
 </svg>
 
 <div class="property-info">
 <div id="propertyType"></div>
 <div id="propertySize"></div>
+<div id="propertyExtra"></div>
 </div>
 
 </div>
 
 </div>
 
-<!-- ================= PRAWA ================= -->
+<!-- RIGHT -->
 
 <div class="right" id="content">
 
 <h1>SPRZEDAŻ+</h1>
 <p>Zaczynamy sprzedaż Twojej nieruchomości.</p>
 
-<button class="button" onclick="start()">Rozpocznij</button>
+<button class="button" onclick="start()">Start</button>
 
 </div>
 
@@ -214,150 +183,181 @@ p {
 
 <script>
 
-/* ================= STATE ================= */
-
 let step = 0;
 let data = {};
 
-/* ================= FLOW ================= */
+/* ===== FLOW ===== */
 
-function start() {
-    nextStep();
-}
+function start(){ nextStep(); }
 
-function nextStep() {
+function nextStep(){
     step++;
+    const c = document.getElementById("content");
 
-    const content = document.getElementById("content");
-
-    if (step === 1) {
-        content.innerHTML = `
-            <h1>Co sprzedajesz?</h1>
-
-            <div class="option" onclick="selectType('apartment')">Mieszkanie</div>
-            <div class="option" onclick="selectType('house')">Dom</div>
-            <div class="option" onclick="selectType('land')">Działka</div>
+    if(step===1){
+        c.innerHTML=`
+        <h1>Co sprzedajesz?</h1>
+        <div class="option" onclick="selectType('house')">Dom</div>
+        <div class="option" onclick="selectType('apartment')">Mieszkanie</div>
+        <div class="option" onclick="selectType('land')">Działka</div>
         `;
     }
 
-    if (step === 2) {
-        content.innerHTML = `
-            <h1>Podaj metraż</h1>
-
-            <input class="input" type="number" id="sizeInput" placeholder="np. 75">
-
-            <button class="button" onclick="saveSize()">Dalej</button>
+    if(step===2){
+        c.innerHTML=`
+        <h1>Metraż</h1>
+        <input class="input" id="size" placeholder="np. 70">
+        <button class="button" onclick="saveSize()">Dalej</button>
         `;
     }
 
-    if (step === 3) {
-        content.innerHTML = `
-            <h1>Dzięki.</h1>
-            <p>To dopiero początek procesu.</p>
+    if(step===3){
+        c.innerHTML=`
+        <h1>Liczba pokoi</h1>
+        <input class="input" id="rooms" placeholder="np. 3">
+        <button class="button" onclick="saveRooms()">Dalej</button>
         `;
+    }
+
+    if(step===4){
+        c.innerHTML=`
+        <h1>Czy jest balkon?</h1>
+        <div class="option" onclick="setBalcony(true)">Tak</div>
+        <div class="option" onclick="setBalcony(false)">Nie</div>
+        `;
+    }
+
+    if(step===5){
+        c.innerHTML=`
+        <h1>Na którym piętrze?</h1>
+        <input class="input" id="floor" placeholder="np. 3">
+        <button class="button" onclick="saveFloor()">Dalej</button>
+        `;
+    }
+
+    if(step===6){
+        c.innerHTML=`<h1>Gotowe.</h1>`;
     }
 }
 
-/* ================= SVG SHAPES ================= */
+/* ===== SVG ===== */
 
-function setShape(type) {
-
-    const s1 = document.getElementById("shape1");
-    const s2 = document.getElementById("shape2");
-    const s3 = document.getElementById("shape3");
-    const s4 = document.getElementById("shape4");
-    const s5 = document.getElementById("shape5");
-    const s6 = document.getElementById("shape6");
-
-    // reset
-    s1.setAttribute("d", "");
-    s2.setAttribute("d", "");
-    s3.setAttribute("width", 0);
-    s4.setAttribute("width", 0);
-    s5.setAttribute("width", 0);
-    s6.setAttribute("x1", 0);
-
-    if (type === "house") {
-        s1.setAttribute("d", "M100 200 L200 120 L300 200 V300 H100 Z");
-        s2.setAttribute("d", "M100 200 L200 120 L300 200");
-
-        s3.setAttribute("x", 180);
-        s3.setAttribute("y", 240);
-        s3.setAttribute("width", 40);
-        s3.setAttribute("height", 60);
-
-        s4.setAttribute("x", 130);
-        s4.setAttribute("y", 220);
-        s4.setAttribute("width", 30);
-        s4.setAttribute("height", 30);
-
-        s5.setAttribute("x", 240);
-        s5.setAttribute("y", 220);
-        s5.setAttribute("width", 30);
-        s5.setAttribute("height", 30);
-    }
-
-    if (type === "apartment") {
-        s1.setAttribute("d", "M130 120 H270 V300 H130 Z");
-
-        s6.setAttribute("x1", 130);
-        s6.setAttribute("y1", 180);
-        s6.setAttribute("x2", 270);
-        s6.setAttribute("y2", 180);
-    }
-
-    if (type === "land") {
-        s1.setAttribute("d", "M100 150 H300 V270 H100 Z");
-    }
-
-    drawProperty();
-}
-
-/* ================= SVG ANIM ================= */
-
-function drawProperty() {
+function draw(){
     const svg = document.getElementById("propertySVG");
-
     svg.classList.remove("draw");
-
     svg.classList.add("active");
 
-    setTimeout(() => {
-        svg.classList.add("draw");
-    }, 50);
+    setTimeout(()=> svg.classList.add("draw"),50);
 }
 
-/* ================= ACTIONS ================= */
+function setShape(type){
 
-function selectType(type) {
+    const main = document.getElementById("mainShape");
 
-    data.type = type;
+    if(type==="house"){
+        main.setAttribute("d","M100 200 L200 120 L300 200 V300 H100 Z");
+    }
+
+    if(type==="apartment"){
+        main.setAttribute("d","M130 120 H270 V300 H130 Z");
+    }
+
+    if(type==="land"){
+        main.setAttribute("d","M100 200 H300 V280 H100 Z");
+    }
+
+    draw();
+}
+
+/* ===== DYNAMICZNE ELEMENTY ===== */
+
+function updateRooms(n){
+    const rooms=[room1,room2,room3];
+
+    rooms.forEach((r,i)=>{
+        if(i<n){
+            r.setAttribute("x",140+i*50);
+            r.setAttribute("y",220);
+            r.setAttribute("width",30);
+            r.setAttribute("height",30);
+        } else {
+            r.setAttribute("width",0);
+        }
+    });
+
+    draw();
+}
+
+function updateBalcony(show){
+    const b=document.getElementById("balcony");
+
+    if(show){
+        b.setAttribute("x",150);
+        b.setAttribute("y",300);
+        b.setAttribute("width",100);
+        b.setAttribute("height",20);
+    } else {
+        b.setAttribute("width",0);
+    }
+
+    draw();
+}
+
+function updateFloor(n){
+    const f=document.getElementById("floorLine");
+
+    f.setAttribute("x1",320);
+    f.setAttribute("y1",280-(n*20));
+    f.setAttribute("x2",350);
+    f.setAttribute("y2",280-(n*20));
+
+    draw();
+}
+
+/* ===== ACTIONS ===== */
+
+function selectType(type){
+    data.type=type;
 
     setShape(type);
 
-    let label = "";
-
-    if (type === "house") label = "DOM+";
-    if (type === "apartment") label = "MIESZKANIE+";
-    if (type === "land") label = "DZIAŁKA+";
-
-    document.getElementById("propertyType").innerText = label;
+    document.getElementById("propertyType").innerText=type.toUpperCase()+"+";
 
     nextStep();
 }
 
-function saveSize() {
+function saveSize(){
+    let v=document.getElementById("size").value;
+    if(!v) return alert("Podaj metraż");
 
-    const size = document.getElementById("sizeInput").value;
+    data.size=v;
+    document.getElementById("propertySize").innerText=v+" m²";
 
-    if (!size) {
-        alert("Podaj metraż");
-        return;
-    }
+    nextStep();
+}
 
-    data.size = size;
+function saveRooms(){
+    let v=document.getElementById("rooms").value;
+    if(!v) return alert("Podaj pokoje");
 
-    document.getElementById("propertySize").innerText = size + " m²";
+    data.rooms=v;
+    updateRooms(v);
+
+    nextStep();
+}
+
+function setBalcony(v){
+    data.balcony=v;
+    updateBalcony(v);
+    nextStep();
+}
+
+function saveFloor(){
+    let v=document.getElementById("floor").value;
+    if(!v) return alert("Podaj piętro");
+
+    data.floor=v;
+    updateFloor(v);
 
     nextStep();
 }
