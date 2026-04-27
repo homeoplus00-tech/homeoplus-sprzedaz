@@ -44,22 +44,22 @@ justify-content:center;
 
 @media(max-width:900px){
 .container{flex-direction:column;}
-.left{height:40%;}
-.right{height:60%;padding:30px;}
+.left{height:45%;}
+.right{height:55%;padding:25px;}
+svg{width:200px;}
 }
 
 /* TYPO */
 
 .hero{
-font-size:42px;
+font-size:40px;
 font-weight:800;
 color:#ebdaa8;
 }
 
 .sub{
 opacity:0.6;
-margin-top:15px;
-margin-bottom:40px;
+margin:20px 0 40px;
 }
 
 /* OPTIONS */
@@ -69,7 +69,7 @@ border:1px solid rgba(255,255,255,0.2);
 padding:14px;
 margin-top:10px;
 cursor:pointer;
-transition:0.25s;
+transition:0.2s;
 }
 
 .option:hover{
@@ -80,8 +80,8 @@ color:#ebdaa8;
 /* SVG */
 
 svg{
-width:280px;
-margin-bottom:40px;
+width:300px;
+margin-bottom:30px;
 }
 
 svg path, svg rect, svg line{
@@ -90,14 +90,14 @@ stroke:#ebdaa8;
 stroke-width:2;
 stroke-dasharray:400;
 stroke-dashoffset:400;
-transition:0.6s;
+transition:0.5s;
 }
 
 .draw path, .draw rect, .draw line{
 stroke-dashoffset:0;
 }
 
-/* STANY */
+/* STATES */
 
 .problem *{
 stroke:red !important;
@@ -116,8 +116,8 @@ text-align:center;
 }
 
 .card strong{
-font-weight:800;
 display:block;
+font-weight:800;
 }
 
 .card span{
@@ -162,7 +162,7 @@ start();
 function start(){
 set(`
 <div class="hero">SPRZEDAŻ+</div>
-<div class="sub">System sprzedaży nieruchomości — prowadzimy cały proces za Ciebie.</div>
+<div class="sub">Prowadzimy cały proces sprzedaży nieruchomości.</div>
 
 <div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
 <div class="option" onclick="chooseType('dom')">Dom</div>
@@ -172,48 +172,10 @@ set(`
 `);
 }
 
-/* ===== FLOW DEFINICJE ===== */
-
-const flows = {
-
-mieszkanie: [
-stepRooms,
-stepFloor,
-stepBalcony,
-stepState
-],
-
-dom: [
-stepRooms,
-stepGarden,
-stepState
-],
-
-lokal: [
-stepShopWindow,
-stepTraffic,
-stepState
-],
-
-hala: [
-stepHeight,
-stepGate,
-stepState
-],
-
-dzialka: [
-stepArea,
-stepAccess,
-stepState
-]
-
-};
-
 /* ===== FLOW ===== */
 
 function next(){
 stepIndex++;
-
 if(stepIndex < flow.length){
 flow[stepIndex]();
 }else{
@@ -221,108 +183,91 @@ analyze();
 }
 }
 
+/* ===== FLOWS ===== */
+
+const flows = {
+
+mieszkanie: [stepRooms, stepFloor, stepBalcony, stepState],
+dom: [stepRooms, stepGarden, stepState],
+lokal: [stepWindow, stepState],
+hala: [stepHeight, stepGate, stepState],
+dzialka: [stepAccess, stepState]
+
+};
+
 /* ===== STEPS ===== */
 
 function stepRooms(){
 set(`
 <h1>Układ nieruchomości</h1>
-<p>Określamy strukturę przestrzeni</p>
-
 ${[1,2,3,4,5].map(n=>`<div class="option" onclick="setRooms(${n})">${n===5?"5+":n}</div>`).join("")}
 `);
 }
 
 function stepFloor(){
 set(`
-<h1>Pozycja w budynku</h1>
-<p>Na którym piętrze znajduje się nieruchomość?</p>
-
-<div class="option" onclick="setFloor('parter')">Parter</div>
-<div class="option" onclick="setFloor('srodek')">Środkowe piętro</div>
-<div class="option" onclick="setFloor('wysokie')">Wysokie piętro</div>
+<h1>Pozycja</h1>
+<div class="option" onclick="setFloor(0)">Parter</div>
+<div class="option" onclick="setFloor(1)">Środek</div>
+<div class="option" onclick="setFloor(2)">Wysoko</div>
 `);
 }
 
 function stepBalcony(){
 set(`
-<h1>Dodatkowa przestrzeń</h1>
-
-<div class="option" onclick="setBalcony(true)">Balkon / taras</div>
-<div class="option" onclick="setBalcony(false)">Brak</div>
+<h1>Balkon</h1>
+<div class="option" onclick="setBalcony(true)">Tak</div>
+<div class="option" onclick="setBalcony(false)">Nie</div>
 `);
 }
 
 function stepGarden(){
 set(`
-<h1>Otoczenie nieruchomości</h1>
-
-<div class="option" onclick="setGarden(true)">Ogród</div>
-<div class="option" onclick="setGarden(false)">Brak</div>
+<h1>Ogród</h1>
+<div class="option" onclick="setGarden(true)">Tak</div>
+<div class="option" onclick="setGarden(false)">Nie</div>
 `);
 }
 
-function stepShopWindow(){
+function stepWindow(){
 set(`
-<h1>Ekspozycja lokalu</h1>
-
-<div class="option" onclick="setWindow(true)">Duża witryna</div>
-<div class="option" onclick="setWindow(false)">Brak witryny</div>
-`);
-}
-
-function stepTraffic(){
-set(`
-<h1>Ruch klientów</h1>
-
-<div class="option" onclick="setTraffic('wysoki')">Wysoki</div>
-<div class="option" onclick="setTraffic('niski')">Niski</div>
+<h1>Witryna</h1>
+<div class="option" onclick="setWindow(true)">Duża</div>
+<div class="option" onclick="setWindow(false)">Brak</div>
 `);
 }
 
 function stepHeight(){
 set(`
 <h1>Wysokość hali</h1>
-
-<div class="option" onclick="setHeight('niska')">Do 4m</div>
-<div class="option" onclick="setHeight('wysoka')">Powyżej 4m</div>
+<div class="option" onclick="setHeight(1)">Niska</div>
+<div class="option" onclick="setHeight(2)">Wysoka</div>
 `);
 }
 
 function stepGate(){
 set(`
-<h1>Dostęp logistyczny</h1>
-
-<div class="option" onclick="setGate(true)">Brama wjazdowa</div>
-<div class="option" onclick="setGate(false)">Brak</div>
-`);
-}
-
-function stepArea(){
-set(`
-<h1>Wielkość działki</h1>
-
-<div class="option" onclick="setArea('mala')">Mała</div>
-<div class="option" onclick="setArea('duza')">Duża</div>
+<h1>Brama</h1>
+<div class="option" onclick="setGate(true)">Tak</div>
+<div class="option" onclick="setGate(false)">Nie</div>
 `);
 }
 
 function stepAccess(){
 set(`
 <h1>Dojazd</h1>
-
-<div class="option" onclick="setAccess(true)">Droga dojazdowa</div>
+<div class="option" onclick="setAccess(true)">Jest</div>
 <div class="option" onclick="setAccess(false)">Brak</div>
 `);
 }
 
 function stepState(){
 set(`
-<h1>Stan nieruchomości</h1>
-
+<h1>Stan</h1>
 <div class="option" onclick="setState('ideal')">Gotowa</div>
-<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
-<div class="option" onclick="setState('renovation')">Do remontu</div>
-<div class="option" onclick="setState('problem')">Problemy prawne</div>
+<div class="option" onclick="setState('refresh')">Odświeżenie</div>
+<div class="option" onclick="setState('renovation')">Remont</div>
+<div class="option" onclick="setState('problem')">Problemy</div>
 `);
 }
 
@@ -330,31 +275,26 @@ set(`
 
 function drawBase(type){
 
-let svg=document.getElementById("svg");
+let svg = document.getElementById("svg");
 svg.innerHTML="";
 svg.className="";
+
+/* BASE */
 
 if(type==="mieszkanie") svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
 if(type==="dom") svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
 if(type==="lokal") svg.innerHTML=`<rect x="120" y="180" width="160" height="120"/>`;
-if(type==="hala") svg.innerHTML=`<rect x="80" y="200" width="240" height="100"/>`;
+if(type==="hala") svg.innerHTML=`<rect id="hall" x="80" y="220" width="240" height="80"/>`;
 if(type==="dzialka") svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
 
 animate();
 }
 
-/* ===== REAKCJE SVG ===== */
+/* ===== REAKCJE ===== */
 
 function setRooms(n){
 data.rooms=n;
 
-drawLines(n);
-updateDetails(n);
-
-next();
-}
-
-function drawLines(n){
 let svg=document.getElementById("svg");
 svg.querySelectorAll("line").forEach(e=>e.remove());
 
@@ -367,7 +307,18 @@ l.setAttribute("y2",320);
 svg.appendChild(l);
 }
 
+updateDetails(n);
 animate();
+next();
+}
+
+function setFloor(level){
+let svg=document.getElementById("svg");
+
+svg.style.transform=`translateY(${-level*10}px)`;
+
+animate();
+next();
 }
 
 function setBalcony(v){
@@ -378,6 +329,67 @@ b.setAttribute("y",320);
 b.setAttribute("width",100);
 b.setAttribute("height",20);
 document.getElementById("svg").appendChild(b);
+}
+animate();
+next();
+}
+
+function setGarden(v){
+if(v){
+let g=document.createElementNS("http://www.w3.org/2000/svg","rect");
+g.setAttribute("x",80);
+g.setAttribute("y",320);
+g.setAttribute("width",240);
+g.setAttribute("height",40);
+document.getElementById("svg").appendChild(g);
+}
+animate();
+next();
+}
+
+function setWindow(v){
+if(v){
+let w=document.createElementNS("http://www.w3.org/2000/svg","rect");
+w.setAttribute("x",150);
+w.setAttribute("y",200);
+w.setAttribute("width",100);
+w.setAttribute("height",40);
+document.getElementById("svg").appendChild(w);
+}
+animate();
+next();
+}
+
+function setHeight(h){
+let hall=document.getElementById("hall");
+if(hall){
+hall.setAttribute("height", h===2?140:80);
+}
+animate();
+next();
+}
+
+function setGate(v){
+if(v){
+let g=document.createElementNS("http://www.w3.org/2000/svg","rect");
+g.setAttribute("x",180);
+g.setAttribute("y",260);
+g.setAttribute("width",40);
+g.setAttribute("height",40);
+document.getElementById("svg").appendChild(g);
+}
+animate();
+next();
+}
+
+function setAccess(v){
+if(v){
+let line=document.createElementNS("http://www.w3.org/2000/svg","line");
+line.setAttribute("x1",0);
+line.setAttribute("y1",300);
+line.setAttribute("x2",100);
+line.setAttribute("y2",260);
+document.getElementById("svg").appendChild(line);
 }
 animate();
 next();
@@ -411,25 +423,6 @@ stepIndex = 0;
 flow[0]();
 }
 
-/* ===== ANALIZA ===== */
-
-function analyze(){
-
-if(data.state==="problem" || data.state==="renovation"){
-set(`
-<h1>OD ZERA+</h1>
-<p>Zajmujemy się nieruchomościami wymagającymi pełnego procesu — od uporządkowania stanu prawnego po przygotowanie i sprzedaż.</p>
-<div class="option">Sprawdź system OD ZERA+</div>
-`);
-}else{
-set(`
-<h1>SPRZEDAŻ+</h1>
-<p>Przechodzimy do kolejnego etapu sprzedaży.</p>
-`);
-}
-
-}
-
 /* ===== UI ===== */
 
 function set(html){
@@ -447,6 +440,22 @@ function animate(){
 let svg=document.getElementById("svg");
 svg.classList.remove("draw");
 setTimeout(()=>svg.classList.add("draw"),50);
+}
+
+/* ===== ANALIZA ===== */
+
+function analyze(){
+
+if(data.state==="problem"||data.state==="renovation"){
+set(`
+<h1>OD ZERA+</h1>
+<p>Zajmujemy się nieruchomością od podstaw — od kwestii prawnych po sprzedaż.</p>
+<div class="option">Sprawdź system</div>
+`);
+}else{
+set(`<h1>SPRZEDAŻ+</h1><p>Przechodzimy dalej.</p>`);
+}
+
 }
 
 </script>
