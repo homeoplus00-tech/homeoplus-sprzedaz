@@ -4,86 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>HOMEO+ SPRZEDAŻ+</title>
+<title>SPRZEDAŻ+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 
-/* UKRYJ WSZYSTKO NA START */
-
-.shape {
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-/* AKTYWNY */
-
-.shape.active {
-    opacity: 1;
-}
-
-/* ANIMACJA RYSOWANIA */
-
-#propertySVG path,
-#propertySVG rect,
-#propertySVG line {
-    fill: none;
-    stroke: var(--color-accent);
-    stroke-width: 2;
-
-    stroke-dasharray: 400;
-    stroke-dashoffset: 400;
-
-    transition: stroke-dashoffset 0.8s ease;
-}
-
-.draw path,
-.draw rect,
-.draw line {
-    stroke-dashoffset: 0;
-}
-    
-/* ================== DESIGN SYSTEM ================== */
+/* ================= DESIGN SYSTEM ================= */
 
 :root {
     --color-bg-main: #FFFFFF;
     --color-bg-dark: #1B1C1E;
-    --color-text-main: #000000;
     --color-text-light: #6F6F6F;
     --color-accent: #ebdaa8;
 
-    --space-xs: 8px;
-    --space-sm: 16px;
-    --space-md: 24px;
     --space-lg: 40px;
     --space-xl: 80px;
-
-    --font-hero: 48px;
-    --font-title: 32px;
-    --font-body: 16px;
 }
+
+/* ================= BASE ================= */
 
 body {
+    margin: 0;
     font-family: 'Montserrat', sans-serif;
     background: var(--color-bg-dark);
-    margin: 0;
 }
 
-/* ================== TYPO ================== */
-
-h1 {
-    font-size: var(--font-hero);
-    font-weight: 800;
-    letter-spacing: -0.5px;
-}
-
-p {
-    font-size: var(--font-body);
-    color: var(--color-text-light);
-}
-
-/* ================== LAYOUT ================== */
+/* ================= LAYOUT ================= */
 
 .container {
     display: flex;
@@ -92,7 +39,6 @@ p {
 
 .left {
     width: 50%;
-    background: var(--color-bg-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -100,90 +46,14 @@ p {
 
 .right {
     width: 50%;
-    background: var(--color-bg-main);
+    background: white;
     padding: var(--space-xl);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-/* ================== SVG VISUAL ================== */
-
-.visual {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-}
-
-svg {
-    width: 100%;
-}
-
-/* LINIE */
-
-#propertySVG path,
-#propertySVG rect {
-    fill: none;
-    stroke: var(--color-accent);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-
-    stroke-dasharray: 400;
-    stroke-dashoffset: 400;
-
-    transition: all 0.6s ease;
-}
-
-/* RYSOWANIE */
-
-.draw path,
-.draw rect {
-    stroke-dashoffset: 0;
-}
-
-/* INFO */
-
-.property-info {
-    position: absolute;
-    bottom: -60px;
-    left: 0;
-    color: var(--color-accent);
-    font-weight: 600;
-}
-
-#propertySize {
-    font-size: 20px;
-    margin-top: 5px;
-}
-
-/* ================== UI ================== */
-
-.button {
-    margin-top: var(--space-lg);
-    padding: 18px 32px;
-    background: var(--color-accent);
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.option {
-    padding: 18px;
-    border: 1px solid #ddd;
-    margin-top: 16px;
-    cursor: pointer;
-}
-
-.input {
-    margin-top: 20px;
-    padding: 16px;
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid #ccc;
-}
-
-/* ================== MOBILE ================== */
+/* ================= MOBILE ================= */
 
 @media (max-width: 900px) {
     .container {
@@ -202,6 +72,98 @@ svg {
     }
 }
 
+/* ================= TYPO ================= */
+
+h1 {
+    font-size: 42px;
+    font-weight: 800;
+}
+
+p {
+    color: var(--color-text-light);
+}
+
+/* ================= UI ================= */
+
+.button {
+    margin-top: 30px;
+    padding: 16px 28px;
+    background: var(--color-accent);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.option {
+    padding: 16px;
+    border: 1px solid #ddd;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.input {
+    margin-top: 20px;
+    padding: 14px;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+/* ================= SVG ================= */
+
+.visual {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+}
+
+#propertySVG {
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* LINIE */
+
+#propertySVG path,
+#propertySVG rect,
+#propertySVG line {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+/* RYSOWANIE */
+
+#propertySVG.active {
+    opacity: 1;
+}
+
+#propertySVG.draw path,
+#propertySVG.draw rect,
+#propertySVG.draw line {
+    stroke-dashoffset: 0;
+}
+
+/* INFO */
+
+.property-info {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+#propertySize {
+    margin-top: 5px;
+}
+
 </style>
 </head>
 
@@ -209,48 +171,55 @@ svg {
 
 <div class="container">
 
-    <!-- LEWA STRONA -->
-    <div class="left">
+<!-- ================= LEWA ================= -->
 
-        <div class="visual">
+<div class="left">
 
-            <svg id="propertySVG" viewBox="0 0 400 400">
+<div class="visual">
 
-                <path d="M100 200 L200 120 L300 200 V300 H100 Z" />
-                <path d="M100 200 L200 120 L300 200" />
+<svg id="propertySVG" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
 
-                <rect x="180" y="240" width="40" height="60" />
+<!-- KSZTAŁT -->
 
-                <rect x="130" y="220" width="30" height="30" />
-                <rect x="240" y="220" width="30" height="30" />
+<path id="shape1"></path>
+<path id="shape2"></path>
+<rect id="shape3"></rect>
+<rect id="shape4"></rect>
+<rect id="shape5"></rect>
+<line id="shape6"></line>
 
-            </svg>
+</svg>
 
-            <div class="property-info">
-                <div id="propertyType"></div>
-                <div id="propertySize"></div>
-            </div>
+<div class="property-info">
+<div id="propertyType"></div>
+<div id="propertySize"></div>
+</div>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
-    <!-- PRAWA STRONA -->
-    <div class="right" id="content">
+<!-- ================= PRAWA ================= -->
 
-        <h1>SPRZEDAŻ+</h1>
-        <p>Zaczynamy sprzedaż Twojej nieruchomości.</p>
+<div class="right" id="content">
 
-        <button class="button" onclick="start()">Rozpocznij</button>
+<h1>SPRZEDAŻ+</h1>
+<p>Zaczynamy sprzedaż Twojej nieruchomości.</p>
 
-    </div>
+<button class="button" onclick="start()">Rozpocznij</button>
+
+</div>
 
 </div>
 
 <script>
 
+/* ================= STATE ================= */
+
 let step = 0;
 let data = {};
+
+/* ================= FLOW ================= */
 
 function start() {
     nextStep();
@@ -260,8 +229,6 @@ function nextStep() {
     step++;
 
     const content = document.getElementById("content");
-
-    /* ===== STEP 1 ===== */
 
     if (step === 1) {
         content.innerHTML = `
@@ -273,8 +240,6 @@ function nextStep() {
         `;
     }
 
-    /* ===== STEP 2 ===== */
-
     if (step === 2) {
         content.innerHTML = `
             <h1>Podaj metraż</h1>
@@ -285,64 +250,104 @@ function nextStep() {
         `;
     }
 
-    /* ===== STEP 3 (FIX) ===== */
-
     if (step === 3) {
         content.innerHTML = `
             <h1>Dzięki.</h1>
-            <p>Przechodzimy dalej w procesie sprzedaży.</p>
+            <p>To dopiero początek procesu.</p>
         `;
     }
 }
 
-/* ================= SVG ================= */
+/* ================= SVG SHAPES ================= */
 
-function resetShapes() {
-    document.querySelectorAll(".shape").forEach(el => {
-        el.classList.remove("active");
-    });
+function setShape(type) {
+
+    const s1 = document.getElementById("shape1");
+    const s2 = document.getElementById("shape2");
+    const s3 = document.getElementById("shape3");
+    const s4 = document.getElementById("shape4");
+    const s5 = document.getElementById("shape5");
+    const s6 = document.getElementById("shape6");
+
+    // reset
+    s1.setAttribute("d", "");
+    s2.setAttribute("d", "");
+    s3.setAttribute("width", 0);
+    s4.setAttribute("width", 0);
+    s5.setAttribute("width", 0);
+    s6.setAttribute("x1", 0);
+
+    if (type === "house") {
+        s1.setAttribute("d", "M100 200 L200 120 L300 200 V300 H100 Z");
+        s2.setAttribute("d", "M100 200 L200 120 L300 200");
+
+        s3.setAttribute("x", 180);
+        s3.setAttribute("y", 240);
+        s3.setAttribute("width", 40);
+        s3.setAttribute("height", 60);
+
+        s4.setAttribute("x", 130);
+        s4.setAttribute("y", 220);
+        s4.setAttribute("width", 30);
+        s4.setAttribute("height", 30);
+
+        s5.setAttribute("x", 240);
+        s5.setAttribute("y", 220);
+        s5.setAttribute("width", 30);
+        s5.setAttribute("height", 30);
+    }
+
+    if (type === "apartment") {
+        s1.setAttribute("d", "M130 120 H270 V300 H130 Z");
+
+        s6.setAttribute("x1", 130);
+        s6.setAttribute("y1", 180);
+        s6.setAttribute("x2", 270);
+        s6.setAttribute("y2", 180);
+    }
+
+    if (type === "land") {
+        s1.setAttribute("d", "M100 150 H300 V270 H100 Z");
+    }
+
+    drawProperty();
 }
+
+/* ================= SVG ANIM ================= */
 
 function drawProperty() {
     const svg = document.getElementById("propertySVG");
 
     svg.classList.remove("draw");
 
+    svg.classList.add("active");
+
     setTimeout(() => {
         svg.classList.add("draw");
     }, 50);
 }
 
-function setType(type) {
-
-    resetShapes();
-
-    document.getElementById(type).classList.add("active");
-
-    drawProperty();
-
-    /* tekst */
-
-    let label = "";
-
-    if (type === "apartment") label = "MIESZKANIE+";
-    if (type === "house") label = "DOM+";
-    if (type === "land") label = "DZIAŁKA+";
-
-    document.getElementById("propertyType").innerText = label;
-}
-
 /* ================= ACTIONS ================= */
 
 function selectType(type) {
+
     data.type = type;
 
-    setType(type);
+    setShape(type);
+
+    let label = "";
+
+    if (type === "house") label = "DOM+";
+    if (type === "apartment") label = "MIESZKANIE+";
+    if (type === "land") label = "DZIAŁKA+";
+
+    document.getElementById("propertyType").innerText = label;
 
     nextStep();
 }
 
 function saveSize() {
+
     const size = document.getElementById("sizeInput").value;
 
     if (!size) {
