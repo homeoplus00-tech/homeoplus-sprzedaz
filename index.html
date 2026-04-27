@@ -25,9 +25,9 @@ height:100vh;
 .left{
 width:50%;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
-flex-direction:column;
 }
 
 .right{
@@ -38,24 +38,52 @@ flex-direction:column;
 justify-content:center;
 }
 
+/* MOBILE */
+
 @media(max-width:900px){
 .container{flex-direction:column;}
 .left{height:45%;}
 .right{height:55%;padding:25px;}
+svg{width:220px;}
 }
 
 /* UI */
 
+h1{
+font-size:34px;
+font-weight:800;
+margin-bottom:10px;
+}
+
+.sub{
+opacity:0.6;
+margin-bottom:25px;
+}
+
 .option{
 border:1px solid rgba(255,255,255,0.2);
-padding:12px;
+padding:14px;
 margin-top:10px;
 cursor:pointer;
+transition:0.2s;
 }
 
 .option:hover{
 border-color:#ebdaa8;
 color:#ebdaa8;
+}
+
+/* INPUT PREMIUM */
+
+.input{
+margin-top:15px;
+padding:14px;
+width:100%;
+background:transparent;
+border:none;
+border-bottom:1px solid rgba(255,255,255,0.3);
+color:white;
+font-size:16px;
 }
 
 .slider{
@@ -71,13 +99,33 @@ margin-top:10px;
 /* SVG */
 
 svg{
-width:280px;
+width:300px;
+margin-bottom:30px;
 }
 
-svg rect{
+svg rect, svg path, svg line{
+fill:none;
 stroke:#ebdaa8;
 stroke-width:2;
-fill:none;
+transition:0.4s;
+}
+
+/* STATES */
+
+.problem *{
+stroke:red !important;
+stroke-dasharray:6;
+}
+
+.refresh *{
+opacity:0.4;
+}
+
+/* CARD */
+
+.card{
+color:#ebdaa8;
+text-align:center;
 }
 
 </style>
@@ -91,7 +139,10 @@ fill:none;
 
 <svg id="svg" viewBox="0 0 400 400"></svg>
 
-<div id="summary"></div>
+<div class="card">
+<div id="type"></div>
+<div id="details"></div>
+</div>
 
 </div>
 
@@ -100,6 +151,8 @@ fill:none;
 </div>
 
 <script>
+
+/* STATE */
 
 let data = {};
 let flow = [];
@@ -111,18 +164,18 @@ start();
 
 function start(){
 set(`
-<h1>SPRZEDAŻ+</h1>
-<p>Przejmujemy proces sprzedaży nieruchomości.</p>
+<h1 style="color:#ebdaa8;">SPRZEDAŻ+</h1>
+<div class="sub">Prowadzimy sprzedaż nieruchomości od początku do końca.</div>
 
 <div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
 <div class="option" onclick="chooseType('dom')">Dom</div>
-<div class="option" onclick="chooseType('lokal')">Lokal</div>
-<div class="option" onclick="chooseType('hala')">Hala</div>
+<div class="option" onclick="chooseType('lokal')">Lokal usługowy</div>
+<div class="option" onclick="chooseType('hala')">Magazyn / hala</div>
 <div class="option" onclick="chooseType('dzialka')">Działka</div>
 `);
 }
 
-/* FLOW */
+/* FLOW CONTROL */
 
 function next(){
 stepIndex++;
@@ -137,25 +190,70 @@ analyze();
 
 const flows = {
 
-mieszkanie: [cityStep, sizeStep, roomsStep, floorStep, stateStep],
-dom: [cityStep, sizeStep, gardenStep, stateStep],
-lokal: [cityStep, sizeStep, trafficStep, stateStep],
-hala: [cityStep, sizeStep, heightStep, stateStep],
-dzialka: [cityStep, sizeStep, accessStep, stateStep]
+/* MIESZKANIE */
+
+mieszkanie: [
+stepCity,
+stepSize,
+stepRooms,
+stepFloor,
+stepBalcony,
+stepState
+],
+
+/* DOM */
+
+dom: [
+stepCity,
+stepSize,
+stepGarden,
+stepGarage,
+stepState
+],
+
+/* LOKAL */
+
+lokal: [
+stepCity,
+stepSize,
+stepWindow,
+stepTraffic,
+stepState
+],
+
+/* HALA */
+
+hala: [
+stepCity,
+stepSize,
+stepHeight,
+stepGate,
+stepState
+],
+
+/* DZIAŁKA */
+
+dzialka: [
+stepCity,
+stepSize,
+stepAccess,
+stepMedia,
+stepState
+]
 
 };
 
-/* STEPS */
+/* ===== STEPS ===== */
 
-function cityStep(){
+function stepCity(){
 set(`
 <h1>Lokalizacja</h1>
-<input id="city" placeholder="Miasto" class="slider">
+<input class="input" id="city" placeholder="Miasto">
 <div class="option" onclick="saveCity()">Dalej</div>
 `);
 }
 
-function sizeStep(){
+function stepSize(){
 set(`
 <h1>Metraż</h1>
 <input type="range" min="20" max="500" value="100" class="slider"
@@ -165,24 +263,32 @@ oninput="updateSize(this.value)">
 `);
 }
 
-function roomsStep(){
+function stepRooms(){
 set(`
 <h1>Pokoje</h1>
 ${[1,2,3,4,5].map(n=>`<div class="option" onclick="setRooms(${n})">${n}</div>`).join("")}
 `);
 }
 
-function floorStep(){
+function stepFloor(){
 set(`
 <h1>Piętro</h1>
-<input type="range" min="0" max="10" value="2"
-oninput="updateFloor(this.value)" class="slider">
+<input type="range" min="0" max="10" value="2" class="slider"
+oninput="updateFloor(this.value)">
 <div class="value" id="floorVal">2</div>
 <div class="option" onclick="confirmFloor()">Dalej</div>
 `);
 }
 
-function gardenStep(){
+function stepBalcony(){
+set(`
+<h1>Balkon</h1>
+<div class="option" onclick="setBalcony(true)">Tak</div>
+<div class="option" onclick="setBalcony(false)">Nie</div>
+`);
+}
+
+function stepGarden(){
 set(`
 <h1>Ogród</h1>
 <div class="option" onclick="setGarden(true)">Tak</div>
@@ -190,25 +296,49 @@ set(`
 `);
 }
 
-function trafficStep(){
+function stepGarage(){
 set(`
-<h1>Ruch</h1>
+<h1>Garaż</h1>
+<div class="option" onclick="setGarage(true)">Tak</div>
+<div class="option" onclick="setGarage(false)">Nie</div>
+`);
+}
+
+function stepWindow(){
+set(`
+<h1>Witryna</h1>
+<div class="option" onclick="setWindow(true)">Duża</div>
+<div class="option" onclick="setWindow(false)">Brak</div>
+`);
+}
+
+function stepTraffic(){
+set(`
+<h1>Ruch klientów</h1>
 <div class="option" onclick="setTraffic('wysoki')">Wysoki</div>
 <div class="option" onclick="setTraffic('niski')">Niski</div>
 `);
 }
 
-function heightStep(){
+function stepHeight(){
 set(`
 <h1>Wysokość hali</h1>
-<input type="range" min="2" max="12" value="5"
-oninput="updateHeight(this.value)" class="slider">
+<input type="range" min="2" max="12" value="5" class="slider"
+oninput="updateHeight(this.value)">
 <div class="value" id="heightVal">5 m</div>
 <div class="option" onclick="confirmHeight()">Dalej</div>
 `);
 }
 
-function accessStep(){
+function stepGate(){
+set(`
+<h1>Brama</h1>
+<div class="option" onclick="setGate(true)">Tak</div>
+<div class="option" onclick="setGate(false)">Nie</div>
+`);
+}
+
+function stepAccess(){
 set(`
 <h1>Dojazd</h1>
 <div class="option" onclick="setAccess(true)">Jest</div>
@@ -216,26 +346,50 @@ set(`
 `);
 }
 
-function stateStep(){
+function stepMedia(){
+set(`
+<h1>Media</h1>
+<div class="option" onclick="setMedia(true)">Dostępne</div>
+<div class="option" onclick="setMedia(false)">Brak</div>
+`);
+}
+
+function stepState(){
 set(`
 <h1>Stan</h1>
 <div class="option" onclick="setState('ideal')">Gotowa</div>
+<div class="option" onclick="setState('refresh')">Odświeżenie</div>
 <div class="option" onclick="setState('renovation')">Remont</div>
 <div class="option" onclick="setState('problem')">Problemy</div>
 `);
 }
 
-/* ACTIONS */
+/* ===== SVG ===== */
+
+function drawBase(type){
+
+let svg=document.getElementById("svg");
+svg.innerHTML="";
+svg.className="";
+
+if(type==="mieszkanie") svg.innerHTML=`<rect id="shape" x="100" y="120" width="200" height="200"/>`;
+if(type==="dom") svg.innerHTML=`<path id="shape" d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
+if(type==="lokal") svg.innerHTML=`<rect id="shape" x="120" y="180" width="160" height="120"/>`;
+if(type==="hala") svg.innerHTML=`<rect id="shape" x="100" y="220" width="200" height="80"/>`;
+if(type==="dzialka") svg.innerHTML=`<rect id="shape" x="100" y="220" width="200" height="80"/>`;
+}
+
+/* ===== ACTIONS ===== */
 
 function chooseType(t){
 data={};
 data.type=t;
-
 drawBase(t);
+
+document.getElementById("type").innerText=t.toUpperCase();
 
 flow = flows[t];
 stepIndex=0;
-
 flow[0]();
 }
 
@@ -246,6 +400,9 @@ next();
 
 function updateSize(v){
 document.getElementById("sizeVal").innerText=v+" m²";
+
+let shape=document.getElementById("shape");
+shape.setAttribute("width", v/2);
 }
 
 function confirmSize(){
@@ -255,11 +412,25 @@ next();
 
 function setRooms(n){
 data.rooms=n;
+
+let svg=document.getElementById("svg");
+svg.querySelectorAll("line").forEach(e=>e.remove());
+
+for(let i=1;i<n;i++){
+let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+l.setAttribute("x1",100+(i*(200/n)));
+l.setAttribute("y1",120);
+l.setAttribute("x2",100+(i*(200/n)));
+l.setAttribute("y2",320);
+svg.appendChild(l);
+}
+
 next();
 }
 
 function updateFloor(v){
 document.getElementById("floorVal").innerText=v;
+document.getElementById("svg").style.transform=`translateY(${-v*3}px)`;
 }
 
 function confirmFloor(){
@@ -267,8 +438,51 @@ data.floor=document.getElementById("floorVal").innerText;
 next();
 }
 
+function setBalcony(v){
+if(v){
+let b=document.createElementNS("http://www.w3.org/2000/svg","rect");
+b.setAttribute("x",150);
+b.setAttribute("y",320);
+b.setAttribute("width",100);
+b.setAttribute("height",20);
+document.getElementById("svg").appendChild(b);
+}
+next();
+}
+
 function setGarden(v){
-data.garden=v;
+if(v){
+let g=document.createElementNS("http://www.w3.org/2000/svg","rect");
+g.setAttribute("x",80);
+g.setAttribute("y",320);
+g.setAttribute("width",240);
+g.setAttribute("height",40);
+document.getElementById("svg").appendChild(g);
+}
+next();
+}
+
+function setGarage(v){
+if(v){
+let g=document.createElementNS("http://www.w3.org/2000/svg","rect");
+g.setAttribute("x",280);
+g.setAttribute("y",260);
+g.setAttribute("width",40);
+g.setAttribute("height",40);
+document.getElementById("svg").appendChild(g);
+}
+next();
+}
+
+function setWindow(v){
+if(v){
+let w=document.createElementNS("http://www.w3.org/2000/svg","rect");
+w.setAttribute("x",150);
+w.setAttribute("y",200);
+w.setAttribute("width",100);
+w.setAttribute("height",40);
+document.getElementById("svg").appendChild(w);
+}
 next();
 }
 
@@ -279,6 +493,9 @@ next();
 
 function updateHeight(v){
 document.getElementById("heightVal").innerText=v+" m";
+
+let shape=document.getElementById("shape");
+shape.setAttribute("height", v*10);
 }
 
 function confirmHeight(){
@@ -286,8 +503,32 @@ data.height=document.getElementById("heightVal").innerText;
 next();
 }
 
+function setGate(v){
+if(v){
+let g=document.createElementNS("http://www.w3.org/2000/svg","rect");
+g.setAttribute("x",180);
+g.setAttribute("y",260);
+g.setAttribute("width",40);
+g.setAttribute("height",40);
+document.getElementById("svg").appendChild(g);
+}
+next();
+}
+
 function setAccess(v){
-data.access=v;
+if(v){
+let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+l.setAttribute("x1",0);
+l.setAttribute("y1",300);
+l.setAttribute("x2",100);
+l.setAttribute("y2",260);
+document.getElementById("svg").appendChild(l);
+}
+next();
+}
+
+function setMedia(v){
+data.media=v;
 next();
 }
 
@@ -296,14 +537,7 @@ data.state=s;
 next();
 }
 
-/* SVG */
-
-function drawBase(type){
-let svg=document.getElementById("svg");
-svg.innerHTML=`<rect x="100" y="200" width="200" height="100"/>`;
-}
-
-/* ANALIZA */
+/* ===== ANALIZA ===== */
 
 function analyze(){
 set(`<h1>Gotowe</h1><p>Dane zapisane</p>`);
@@ -316,5 +550,6 @@ document.getElementById("content").innerHTML=html;
 }
 
 </script>
+
 </body>
 </html>
