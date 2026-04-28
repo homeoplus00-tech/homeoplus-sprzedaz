@@ -6,7 +6,6 @@
 <title>HOMEO+</title>
 
 <style>
-
 body{
 margin:0;
 background:#0f1113;
@@ -38,6 +37,8 @@ padding:50px;
 .right{height:60%;width:100%;padding:20px;}
 }
 
+/* UI */
+
 h1{
 font-size:28px;
 margin-bottom:20px;
@@ -63,15 +64,19 @@ border-color:#ebdaa8;
 color:#ebdaa8;
 }
 
+/* SVG */
+
 svg{
 width:260px;
 }
 
-line, rect, path{
+line, rect{
 stroke:#ebdaa8;
 fill:none;
 stroke-width:2;
 }
+
+/* STATES */
 
 .problem *{
 stroke:red !important;
@@ -102,37 +107,26 @@ opacity:0.5;
 /* STATE */
 
 let data = {};
-let currentType = "";
 
 /* START */
 
 start();
 
 function start(){
-set(`
+document.getElementById("content").innerHTML = `
 <h1>SPRZEDAŻ+</h1>
-
-<div class="grid">
-<div class="option" onclick="chooseType('mieszkanie')">Mieszkanie</div>
-<div class="option" onclick="chooseType('dom')">Dom</div>
-<div class="option" onclick="chooseType('lokal')">Lokal</div>
-<div class="option" onclick="chooseType('hala')">Hala</div>
-<div class="option" onclick="chooseType('dzialka')">Działka</div>
-</div>
-`);
+<div class="option" onclick="startFlow()">Rozpocznij</div>
+`;
 }
 
-/* TYPE */
+/* FLOW */
 
-function chooseType(type){
-data = {};
-currentType = type;
-
-drawBase(type);
+function startFlow(){
+drawBase();
 stepCity();
 }
 
-/* COMMON */
+/* ===== STEPS ===== */
 
 function stepCity(){
 set(`
@@ -157,256 +151,173 @@ set(`
 <h1>Metraż</h1>
 <div class="grid">
 <div class="option" onclick="save('size','<40')">do 40</div>
-<div class="option" onclick="save('size','40-80')">40–80</div>
-<div class="option" onclick="save('size','80-150')">80–150</div>
-<div class="option" onclick="save('size','150+')">150+</div>
+<div class="option" onclick="save('size','40-60')">40–60</div>
+<div class="option" onclick="save('size','60-100')">60–100</div>
+<div class="option" onclick="save('size','100+')">100+</div>
 </div>
 `);
 }
 
-/* FLOW DECISION */
+function stepRooms(){
+set(`
+<h1>Pokoje</h1>
+<div class="grid">
+${[1,2,3,4,'5+'].map(n=>`<div class="option" onclick="setRooms('${n}')">${n}</div>`).join("")}
+</div>
+`);
+}
+
+function stepFloor(){
+set(`
+<h1>Piętro</h1>
+<div class="grid">
+<div class="option" onclick="setFloor(0)">Parter</div>
+<div class="option" onclick="setFloor(-10)">Środek</div>
+<div class="option" onclick="setFloor(-20)">Wysokie</div>
+</div>
+`);
+}
+
+function stepElevator(){
+set(`
+<h1>Winda</h1>
+<div class="grid">
+<div class="option" onclick="save('elevator',true)">Tak</div>
+<div class="option" onclick="save('elevator',false)">Nie</div>
+</div>
+`);
+}
+
+function stepBalcony(){
+set(`
+<h1>Balkon / taras</h1>
+<div class="grid">
+<div class="option" onclick="setBalcony(true)">Tak</div>
+<div class="option" onclick="setBalcony(false)">Nie</div>
+</div>
+`);
+}
+
+function stepParking(){
+set(`
+<h1>Parking</h1>
+<div class="grid">
+<div class="option" onclick="save('parking',true)">Tak</div>
+<div class="option" onclick="save('parking',false)">Nie</div>
+</div>
+`);
+}
+
+function stepStandard(){
+set(`
+<h1>Standard</h1>
+<div class="grid">
+<div class="option" onclick="save('standard','premium')">Premium</div>
+<div class="option" onclick="save('standard','ok')">Dobry</div>
+<div class="option" onclick="save('standard','remont')">Do remontu</div>
+</div>
+`);
+}
+
+function stepState(){
+set(`
+<h1>Stan prawny / sytuacja</h1>
+<div class="grid">
+<div class="option" onclick="setState('ideal')">Gotowa</div>
+<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
+<div class="option" onclick="setState('problem')">Problemy</div>
+</div>
+`);
+}
+
+/* ===== ACTIONS ===== */
 
 function saveCity(){
 data.city = document.getElementById("city").value;
 stepLocation();
 }
 
-function save(key,val){
-data[key]=val;
+function save(k,v){
+data[k]=v;
 
-if(key==="location") stepSize();
-
-else if(key==="size"){
-if(currentType==="mieszkanie") stepRooms();
-if(currentType==="dom") stepFloors();
-if(currentType==="lokal") stepPurpose();
-if(currentType==="hala") stepHeight();
-if(currentType==="dzialka") stepPlotType();
-}
+if(k==="location") stepSize();
+else if(k==="size") stepRooms();
+else if(k==="elevator") stepBalcony();
+else if(k==="parking") stepStandard();
+else if(k==="standard") stepState();
 }
 
-/* ===== MIESZKANIE ===== */
+/* SVG */
 
-function stepRooms(){
-set(`<h1>Pokoje</h1>
-<div class="grid">
-${[1,2,3,4,'5+'].map(n=>`<div class="option" onclick="setRooms('${n}')">${n}</div>`).join("")}
-</div>`);
+function drawBase(){
+let svg = document.getElementById("svg");
+svg.innerHTML = `<rect x="100" y="120" width="200" height="200"/>`;
 }
 
-function stepFloor(){
-set(`<h1>Piętro</h1>
-<div class="grid">
-<div class="option" onclick="setFloor(0)">Parter</div>
-<div class="option" onclick="setFloor(-10)">Środek</div>
-<div class="option" onclick="setFloor(-20)">Wysokie</div>
-</div>`);
-}
-
-function stepBalcony(){
-set(`<h1>Balkon</h1>
-<div class="grid">
-<div class="option" onclick="setBalcony(true)">Tak</div>
-<div class="option" onclick="setBalcony(false)">Nie</div>
-</div>`);
-}
-
-/* ===== DOM ===== */
-
-function stepFloors(){
-set(`<h1>Kondygnacje</h1>
-<div class="grid">
-<div class="option" onclick="setFloors(1)">1</div>
-<div class="option" onclick="setFloors(2)">2+</div>
-</div>`);
-}
-
-function stepGarden(){
-set(`<h1>Ogród</h1>
-<div class="grid">
-<div class="option" onclick="setGarden(true)">Tak</div>
-<div class="option" onclick="setGarden(false)">Nie</div>
-</div>`);
-}
-
-function stepGarage(){
-set(`<h1>Garaż</h1>
-<div class="grid">
-<div class="option" onclick="setGarage(true)">Tak</div>
-<div class="option" onclick="setGarage(false)">Nie</div>
-</div>`);
-}
-
-/* ===== LOKAL ===== */
-
-function stepPurpose(){
-set(`<h1>Przeznaczenie</h1>
-<div class="grid">
-<div class="option" onclick="setPurpose('handel')">Handel</div>
-<div class="option" onclick="setPurpose('biuro')">Biuro</div>
-<div class="option" onclick="setPurpose('gastronomia')">Gastronomia</div>
-</div>`);
-}
-
-function stepWindow(){
-set(`<h1>Witryna</h1>
-<div class="grid">
-<div class="option" onclick="setWindow(true)">Tak</div>
-<div class="option" onclick="setWindow(false)">Nie</div>
-</div>`);
-}
-
-/* ===== HALA ===== */
-
-function stepHeight(){
-set(`<h1>Wysokość</h1>
-<div class="grid">
-<div class="option" onclick="setHeight(80)">Niska</div>
-<div class="option" onclick="setHeight(140)">Wysoka</div>
-</div>`);
-}
-
-function stepGate(){
-set(`<h1>Brama</h1>
-<div class="grid">
-<div class="option" onclick="setGate(true)">Tak</div>
-<div class="option" onclick="setGate(false)">Nie</div>
-</div>`);
-}
-
-/* ===== DZIAŁKA ===== */
-
-function stepPlotType(){
-set(`<h1>Typ działki</h1>
-<div class="grid">
-<div class="option" onclick="setPlot('budowlana')">Budowlana</div>
-<div class="option" onclick="setPlot('rolna')">Rolna</div>
-</div>`);
-}
-
-function stepAccess(){
-set(`<h1>Dojazd</h1>
-<div class="grid">
-<div class="option" onclick="setAccess(true)">Tak</div>
-<div class="option" onclick="setAccess(false)">Nie</div>
-</div>`);
-}
-
-/* ===== SVG ===== */
-
-function drawBase(type){
-let svg=document.getElementById("svg");
-
-if(type==="mieszkanie") svg.innerHTML=`<rect x="100" y="120" width="200" height="200"/>`;
-if(type==="dom") svg.innerHTML=`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
-if(type==="lokal") svg.innerHTML=`<rect x="120" y="180" width="160" height="120"/>`;
-if(type==="hala") svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
-if(type==="dzialka") svg.innerHTML=`<rect x="100" y="220" width="200" height="80"/>`;
-}
-
-/* ===== ACTIONS ===== */
+/* ROOMS */
 
 function setRooms(n){
-let svg=document.getElementById("svg");
-drawBase("mieszkanie");
+let svg = document.getElementById("svg");
 
-let count=n==="5+"?5:n;
+drawBase();
+
+let count = n==="5+"?5:n;
 
 for(let i=1;i<count;i++){
-let x=100+(i*(200/count));
-svg.innerHTML+=`<line x1="${x}" y1="120" x2="${x}" y2="320"/>`;
+let x = 100 + (i*(200/count));
+svg.innerHTML += `<line x1="${x}" y1="120" x2="${x}" y2="320"/>`;
 }
 
 stepFloor();
 }
 
+/* FLOOR */
+
 function setFloor(val){
 document.getElementById("svg").style.transform=`translateY(${val}px)`;
-stepBalcony();
+stepElevator();
 }
+
+/* BALCONY */
 
 function setBalcony(v){
 if(v){
-document.getElementById("svg").innerHTML+=`<rect x="150" y="320" width="100" height="20"/>`;
+document.getElementById("svg").innerHTML +=
+`<rect x="150" y="320" width="100" height="20"/>`;
 }
-finish();
-}
-
-/* DOM */
-
-function setFloors(n){
-if(n===2){
-document.getElementById("svg").innerHTML+=`<line x1="100" y1="240" x2="300" y2="240"/>`;
-}
-stepGarden();
+stepParking();
 }
 
-function setGarden(v){
-if(v){
-document.getElementById("svg").innerHTML+=`<rect x="80" y="320" width="240" height="40"/>`;
-}
-stepGarage();
-}
+/* STATE */
 
-function setGarage(v){
-if(v){
-document.getElementById("svg").innerHTML+=`<rect x="280" y="260" width="40" height="40"/>`;
-}
-finish();
-}
+function setState(s){
+data.state = s;
 
-/* LOKAL */
+let svg = document.getElementById("svg");
 
-function setPurpose(p){
-data.purpose=p;
-stepWindow();
-}
+if(s==="problem") svg.classList.add("problem");
+if(s==="refresh") svg.classList.add("refresh");
 
-function setWindow(v){
-if(v){
-document.getElementById("svg").innerHTML+=`<rect x="150" y="200" width="100" height="40"/>`;
-}
-finish();
-}
-
-/* HALA */
-
-function setHeight(h){
-document.querySelector("#svg rect").setAttribute("height",h);
-stepGate();
-}
-
-function setGate(v){
-if(v){
-document.getElementById("svg").innerHTML+=`<rect x="180" y="260" width="40" height="40"/>`;
-}
-finish();
-}
-
-/* DZIAŁKA */
-
-function setPlot(p){
-data.plot=p;
-stepAccess();
-}
-
-function setAccess(v){
-if(v){
-document.getElementById("svg").innerHTML+=`<line x1="0" y1="300" x2="100" y2="260"/>`;
-}
 finish();
 }
 
 /* END */
 
 function finish(){
-set(`<h1>Gotowe</h1>`);
+
+if(data.state==="problem"){
+set(`<h1>OD ZERA+</h1><p>Zajmujemy się wszystkim od podstaw.</p>`);
+}else{
+set(`<h1>SPRZEDAŻ+</h1><p>Przechodzimy dalej.</p>`);
+}
+
+console.log(data);
 }
 
 /* UI */
 
 function set(html){
-document.getElementById("content").innerHTML=html;
+document.getElementById("content").innerHTML = html;
 }
 
 </script>
