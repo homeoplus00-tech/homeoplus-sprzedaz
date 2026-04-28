@@ -1,4 +1,4 @@
-<section class="homeo-app">
+<section class="homeo">
 
 <!-- MODAL -->
 <div id="modal" class="modal">
@@ -14,62 +14,44 @@
 
 <!-- START -->
 <div class="screen start" id="start">
-  <h1><b>SPRZEDAŻ+</b></h1>
+  <h1>SPRZEDAŻ<span>+</span></h1>
   <p>System sprzedaży nieruchomości</p>
 
   <input id="price" placeholder="Wartość (PLN)">
   <input id="size" placeholder="Metraż (m²)">
   <input id="city" placeholder="Miasto">
 
-  <button onclick="openSim()">Uruchom system</button>
+  <button onclick="openSim()">Uruchom</button>
 </div>
 
 <!-- SYSTEM -->
 <div class="screen system hidden" id="system">
 
-  <div class="topbar">
-    <div><b>HOMEO+ SYSTEM</b></div>
+  <div class="top">
+    <div>HOMEO+ SYSTEM</div>
     <div id="day">Dzień 1</div>
   </div>
 
-  <div class="grid">
+  <!-- CENTRALNA OPERACJA -->
+  <div class="focus">
+    <div id="operation">Inicjalizacja systemu</div>
+  </div>
 
-    <!-- OPERACJE -->
-    <div class="panel ops">
-      <h3>Operacje</h3>
-      <div id="ops"></div>
+  <!-- DANE W TLE -->
+  <div class="bottom">
+
+    <div class="price-box">
+      <div id="priceView">0 PLN</div>
+      <span>aktualna cena</span>
     </div>
 
-    <!-- RYNEK -->
-    <div class="panel market">
-      <h3>Rynek</h3>
-      <div id="market"></div>
+    <div class="stats">
+      <div><b id="views">0</b><span>wyświetlenia</span></div>
+      <div><b id="buyers">0</b><span>zainteresowani</span></div>
+      <div><b id="offers">0</b><span>oferty</span></div>
     </div>
 
-    <!-- PANEL -->
-    <div class="panel stats">
-
-      <div class="price" id="currentPrice">0 PLN</div>
-      <div class="sub">Aktualna cena</div>
-
-      <div class="kpis">
-        <div><span id="views">0</span><p>Wyświetlenia</p></div>
-        <div><span id="buyers">0</span><p>Zainteresowani</p></div>
-        <div><span id="offers">0</span><p>Oferty</p></div>
-      </div>
-
-      <div class="app">
-        <b>HOMEO+ APP</b>
-        <p>
-          Klient posiada dostęp do panelu w czasie rzeczywistym:<br>
-          • aktywność kupujących<br>
-          • statystyki oferty<br>
-          • przebieg negocjacji<br>
-          • aktualizacje ceny
-        </p>
-      </div>
-
-    </div>
+    <div class="market" id="market"></div>
 
   </div>
 
@@ -78,7 +60,7 @@
 </section>
 
 <style>
-.homeo-app{
+.homeo{
   font-family:'Montserrat',sans-serif;
   background:#000;
   color:#fff;
@@ -89,7 +71,6 @@
   position:fixed;
   width:100%;
   height:100%;
-  top:0;left:0;
   background:rgba(0,0,0,0.95);
   display:none;
   align-items:center;
@@ -116,9 +97,10 @@
 
 /* START */
 .start h1{
-  font-size:72px;
-  color:#ebdaa8;
+  font-size:80px;
+  letter-spacing:2px;
 }
+.start span{color:#ebdaa8;}
 
 .start p{
   color:#777;
@@ -141,125 +123,124 @@ button{
   border:none;
   color:#000;
   font-weight:600;
-  cursor:pointer;
 }
 
 /* SYSTEM */
 .system{
-  align-items:stretch;
+  justify-content:space-between;
+  padding:40px;
 }
 
-.topbar{
+.top{
+  width:100%;
   display:flex;
   justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #111;
+  font-size:12px;
+  color:#777;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
+/* FOCUS (KLUCZ PREMIUM) */
+.focus{
   flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
-.panel{
-  padding:30px;
-  border-right:1px solid #111;
-}
-
-.panel:last-child{
-  border-right:none;
-}
-
-h3{
-  color:#ebdaa8;
-  margin-bottom:20px;
-  font-weight:600;
-}
-
-/* OPERACJE */
-.operation{
-  margin-bottom:12px;
-  font-size:13px;
-  color:#ccc;
-  border-left:2px solid #ebdaa8;
-  padding-left:10px;
-}
-
-/* RYNEK */
-.market-box{
-  margin-bottom:10px;
-  font-size:13px;
-  color:#888;
-}
-
-/* STATS */
-.price{
+#operation{
   font-size:48px;
+  max-width:900px;
+  line-height:1.2;
   color:#ebdaa8;
+  opacity:0;
+  transform:translateY(20px);
+  transition:all .8s ease;
 }
 
-.sub{
+#operation.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* BOTTOM */
+.bottom{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+}
+
+/* PRICE */
+.price-box{
+  text-align:left;
+}
+.price-box div{
+  font-size:40px;
+  color:#ebdaa8;
+}
+.price-box span{
   font-size:12px;
   color:#666;
 }
 
-.kpis{
+/* STATS */
+.stats{
   display:flex;
-  justify-content:space-between;
-  margin-top:30px;
+  gap:40px;
 }
-
-.kpis span{
-  font-size:24px;
+.stats b{
+  font-size:20px;
   color:#ebdaa8;
 }
-
-.kpis p{
-  font-size:12px;
+.stats span{
+  display:block;
+  font-size:11px;
   color:#777;
 }
 
-.app{
-  margin-top:30px;
-  border-top:1px solid #111;
-  padding-top:20px;
+/* MARKET */
+.market{
   font-size:12px;
   color:#777;
+  text-align:right;
 }
 
 /* MOBILE */
 @media(max-width:900px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-}
 
-/* UTILS */
+  #operation{
+    font-size:28px;
+  }
+
+  .bottom{
+    flex-direction:column;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+}
 .hidden{display:none;}
 </style>
 
 <script>
-let basePrice, price;
+let base, price;
 let views=0, buyers=0, offers=0;
+let demand=1;
 let day=1;
 
-let demand=1;
-let competition=1;
-let momentum=1;
-
-const operations = [
-{txt:"Onboarding + dostęp do aplikacji HOMEO+", effect:()=>demand+=0.2},
-{txt:"Analiza rynku + dane transakcyjne", effect:()=>price*=1.02},
-{txt:"Strategia ceny wejścia", effect:()=>price*=1.01},
-{txt:"Produkcja materiałów premium", effect:()=>demand+=0.3},
-{txt:"Home staging", effect:()=>demand+=0.2},
-{txt:"Publikacja + dystrybucja", effect:()=>views+=800},
-{txt:"Kampania marketingowa", effect:()=>{views+=2000; demand+=0.3}},
-{txt:"Targetowanie kupujących", effect:()=>buyers+=5},
-{txt:"Selekcja klientów", effect:()=>demand+=0.2},
-{txt:"Negocjacje wielostronne", effect:()=>price*=1.04},
-{txt:"Finalizacja transakcji", effect:()=>{}},
+const ops = [
+"Klient otrzymuje dostęp do aplikacji HOMEO+",
+"Analizujemy rynek i dane transakcyjne",
+"Ustalamy strategię ceny wejścia",
+"Produkujemy materiały premium",
+"Optymalizujemy nieruchomość (home staging)",
+"Publikujemy ofertę i uruchamiamy dystrybucję",
+"Rozpoczynamy kampanię marketingową",
+"Precyzyjnie targetujemy kupujących",
+"Selekcjonujemy realnych klientów",
+"Prowadzimy negocjacje wielostronne",
+"Finalizujemy transakcję"
 ];
 
 function openSim(){
@@ -272,8 +253,8 @@ function acceptSim(){
 }
 
 function start(){
-  basePrice = parseInt(document.getElementById("price").value)||500000;
-  price = basePrice;
+  base = parseInt(document.getElementById("price").value)||500000;
+  price = base;
 
   document.getElementById("start").classList.add("hidden");
   document.getElementById("system").classList.remove("hidden");
@@ -281,52 +262,54 @@ function start(){
   run();
 }
 
-function addOperation(text){
-  let el=document.createElement("div");
-  el.className="operation";
-  el.innerText=text;
-  document.getElementById("ops").prepend(el);
+function showOperation(text){
+  let el = document.getElementById("operation");
+  el.classList.remove("show");
+
+  setTimeout(()=>{
+    el.innerText=text;
+    el.classList.add("show");
+  },300);
 }
 
 function updateMarket(){
-  competition = (Math.random()*1.5).toFixed(2);
+  let comp = (Math.random()*1.5).toFixed(2);
   let time = Math.floor(20+Math.random()*40);
 
   document.getElementById("market").innerHTML = `
-    <div class="market-box">Popyt: ${demand.toFixed(2)}</div>
-    <div class="market-box">Konkurencja: ${competition}</div>
-    <div class="market-box">Śr. czas sprzedaży: ${time} dni</div>
+    popyt: ${demand.toFixed(2)}<br>
+    konkurencja: ${comp}<br>
+    śr. czas sprzedaży: ${time} dni
   `;
 }
 
 function run(){
 
-  let step=0;
+  let i=0;
 
-  let interval=setInterval(()=>{
+  let loop=setInterval(()=>{
 
-    if(step < operations.length){
-      let op = operations[step];
-      addOperation(op.txt);
-      op.effect();
-      step++;
+    if(i < ops.length){
+      showOperation(ops[i]);
+
+      demand += 0.15;
+      price *= 1.01;
+
+      i++;
     }
 
-    // dynamika rynku
-    views += Math.floor(150 * demand);
+    views += Math.floor(120 * demand);
     buyers += Math.floor(1 * demand);
 
-    if(Math.random() > 0.65){
+    if(Math.random()>0.7){
       offers++;
-      let increase = basePrice * (0.002 * demand);
-      price += increase;
-      momentum += 0.02;
+      price += base * 0.004 * demand;
     }
 
     document.getElementById("views").innerText=views;
     document.getElementById("buyers").innerText=buyers;
     document.getElementById("offers").innerText=offers;
-    document.getElementById("currentPrice").innerText =
+    document.getElementById("priceView").innerText=
       Math.floor(price).toLocaleString()+" PLN";
 
     updateMarket();
@@ -334,10 +317,11 @@ function run(){
     day++;
     document.getElementById("day").innerText="Dzień "+day;
 
-    if(step >= operations.length){
-      clearInterval(interval);
+    if(i>=ops.length){
+      clearInterval(loop);
     }
 
-  },1800);
+  },3000); // 🔥 wolniej = premium
+
 }
 </script>
