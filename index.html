@@ -1,350 +1,71 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<section class="homeo-system">
 
-<title>HOMEO+</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
-<style>
-
-body{
-margin:0;
-background:#0b0d10;
-color:white;
-font-family:Montserrat;
-}
-
-/* LAYOUT */
-
-.container{
-display:flex;
-height:100vh;
-}
-
-.left{
-width:55%;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
-
-.right{
-width:45%;
-display:flex;
-flex-direction:column;
-justify-content:center;
-padding:80px;
-}
-
-@media(max-width:900px){
-.container{flex-direction:column;}
-.left{height:45%;}
-.right{height:55%;width:100%;padding:30px;}
-}
-
-/* TYPO */
-
-h1{
-font-size:38px;
-font-weight:800;
-color:#ebdaa8;
-margin-bottom:20px;
-}
-
-/* INPUT */
-
-.input{
-width:100%;
-padding:16px;
-background:transparent;
-border:none;
-border-bottom:1px solid rgba(255,255,255,0.3);
-color:white;
-margin-bottom:20px;
-font-size:16px;
-}
-
-/* BUTTON */
-
-.option{
-border:1px solid rgba(255,255,255,0.2);
-padding:16px;
-text-align:center;
-cursor:pointer;
-transition:0.3s;
-margin-top:10px;
-}
-
-.option:hover{
-border-color:#ebdaa8;
-color:#ebdaa8;
-}
-
-/* SVG */
-
-svg{
-width:360px;
-margin-bottom:30px;
-}
-
-svg *{
-stroke:#ebdaa8;
-stroke-width:2;
-fill:none;
-}
-
-/* CARD */
-
-.card{
-width:340px;
-padding:20px;
-border:1px solid rgba(255,255,255,0.15);
-background:rgba(255,255,255,0.03);
-font-size:14px;
-line-height:1.6;
-}
-
-.card b{
-color:#ebdaa8;
-}
-
-/* ERROR */
-
-.error{
-color:red;
-font-size:13px;
-margin-top:-10px;
-margin-bottom:10px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="left">
-
-<svg id="svg" viewBox="0 0 400 400"></svg>
-
-<div class="card" id="card"></div>
-
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h2><b>HOMEO+</b> | <b>SPRZEDAŻ+</b></h2>
+    <p>
+      To symulacja działania systemu sprzedaży.<br><br>
+      Każda nieruchomość analizowana jest indywidualnie.
+    </p>
+    <button onclick="acceptSim()">Rozumiem</button>
+  </div>
 </div>
 
-<div class="right" id="content"></div>
+<!-- START -->
+<div class="screen start" id="start">
+  <h1><b>SPRZEDAŻ+</b></h1>
+  <p>System sprzedaży nieruchomości</p>
 
+  <input id="price" placeholder="Wartość (PLN)">
+  <input id="size" placeholder="Metraż (m²)">
+  <input id="city" placeholder="Miasto">
+
+  <button onclick="openSim()">Uruchom system</button>
 </div>
 
-<script>
+<!-- SYSTEM -->
+<div class="screen system hidden" id="system">
 
-let data = {};
+  <div class="topbar">
+    <div>HOMEO+ SYSTEM</div>
+    <div id="day">Dzień 1</div>
+  </div>
 
-/* START */
+  <div class="grid">
 
-start();
+    <!-- LEFT -->
+    <div class="panel operations">
+      <h3>Operacje</h3>
+      <div id="ops"></div>
+    </div>
 
-function start(){
-drawBase();
-stepCity();
-updateCard();
-}
+    <!-- CENTER -->
+    <div class="panel market">
+      <h3>Rynek</h3>
+      <div id="market"></div>
+    </div>
 
-/* ===== STEPS ===== */
+    <!-- RIGHT -->
+    <div class="panel stats">
 
-function stepCity(){
-set(`
-<h1>Lokalizacja</h1>
-<input id="city" class="input" placeholder="Miasto">
-<div class="error" id="err"></div>
-<div class="option" onclick="saveCity()">Dalej</div>
-`);
-}
+      <div class="price" id="currentPrice">0 PLN</div>
+      <div class="sub">Aktualna cena</div>
 
-function stepHouseSize(){
-set(`
-<h1>Metraż domu (m²)</h1>
-<input id="size" class="input" placeholder="np. 145">
-<div class="error" id="err"></div>
-<div class="option" onclick="saveSize()">Dalej</div>
-`);
-}
+      <div class="kpis">
+        <div><span id="views">0</span><p>Wyświetlenia</p></div>
+        <div><span id="buyers">0</span><p>Zainteresowani</p></div>
+        <div><span id="offers">0</span><p>Oferty</p></div>
+      </div>
 
-function stepPlot(){
-set(`
-<h1>Metraż działki (m²)</h1>
-<input id="plot" class="input" placeholder="np. 800">
-<div class="error" id="err"></div>
-<div class="option" onclick="savePlot()">Dalej</div>
-`);
-}
+      <div class="app">
+        <b>HOMEO+ APP</b>
+        <p>Klient posiada dostęp do panelu i monitoruje wszystko w czasie rzeczywistym.</p>
+      </div>
 
-function stepYear(){
-set(`
-<h1>Rok budowy</h1>
-<input id="year" class="input" placeholder="np. 2008">
-<div class="option" onclick="save('year',year.value)">Dalej</div>
-`);
-}
+    </div>
 
-function stepFloors(){
-set(`
-<h1>Kondygnacje</h1>
-<div class="option" onclick="setFloors(1)">1</div>
-<div class="option" onclick="setFloors(2)">2+</div>
-`);
-}
+  </div>
+</div>
 
-function stepGarden(){
-set(`
-<h1>Ogród</h1>
-<div class="option" onclick="setGarden(true)">Tak</div>
-<div class="option" onclick="setGarden(false)">Nie</div>
-`);
-}
-
-function stepGarage(){
-set(`
-<h1>Garaż</h1>
-<div class="option" onclick="setGarage(true)">Tak</div>
-<div class="option" onclick="setGarage(false)">Nie</div>
-`);
-}
-
-function stepAccess(){
-set(`
-<h1>Dojazd do działki</h1>
-<div class="option" onclick="save('road','asfalt')">Asfalt</div>
-<div class="option" onclick="save('road','utwardzona')">Utwardzona</div>
-`);
-}
-
-function stepState(){
-set(`
-<h1>Stan</h1>
-<div class="option" onclick="setState('ideal')">Gotowy</div>
-<div class="option" onclick="setState('refresh')">Do remontu</div>
-<div class="option" onclick="setState('problem')">Problemy prawne</div>
-`);
-}
-
-/* ===== ACTIONS ===== */
-
-function saveCity(){
-let val = document.getElementById("city").value;
-if(!val) return showError("err","Wpisz miasto");
-data.city = val;
-updateCard();
-stepHouseSize();
-}
-
-function saveSize(){
-let val = document.getElementById("size").value;
-if(!val) return showError("err","Podaj metraż");
-data.size = val;
-updateCard();
-stepPlot();
-}
-
-function savePlot(){
-let val = document.getElementById("plot").value;
-if(!val) return showError("err","Podaj działkę");
-data.plot = val;
-updateCard();
-stepYear();
-}
-
-function save(k,v){
-data[k]=v;
-updateCard();
-
-if(k==="year") stepFloors();
-if(k==="road") finish();
-}
-
-/* SVG */
-
-function drawBase(){
-document.getElementById("svg").innerHTML =
-`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
-}
-
-function setFloors(n){
-if(n===2){
-svg.innerHTML += `<line x1="100" y1="240" x2="300" y2="240"/>`;
-}
-updateCard();
-stepGarden();
-}
-
-function setGarden(v){
-if(v){
-svg.innerHTML += `<rect x="80" y="320" width="240" height="40"/>`;
-}
-updateCard();
-stepGarage();
-}
-
-function setGarage(v){
-if(v){
-svg.innerHTML += `<rect x="280" y="260" width="40" height="40"/>`;
-}
-updateCard();
-stepAccess();
-}
-
-function setState(s){
-data.state = s;
-
-if(s==="problem" || s==="refresh"){
-set(`
-<h1>OD ZERA+</h1>
-<p>Możemy przejąć wszystko: remont, problemy prawne, przygotowanie.</p>
-<div class="option" onclick="stepAccess()">Kontynuuj</div>
-<div class="option" onclick="finish()">OD ZERA+</div>
-`);
-}else{
-stepAccess();
-}
-
-updateCard();
-}
-
-/* CARD */
-
-function updateCard(){
-document.getElementById("card").innerHTML = `
-<b>${data.city || ""}</b><br><br>
-
-<b>Dom:</b> ${data.size || "-"} m²<br>
-<b>Działka:</b> ${data.plot || "-"} m²<br>
-<b>Rok:</b> ${data.year || "-"}<br>
-<b>Dojazd:</b> ${data.road || "-"}
-`;
-}
-
-/* HELPERS */
-
-function showError(id,msg){
-document.getElementById(id).innerText=msg;
-}
-
-/* END */
-
-function finish(){
-set(`<h1>Gotowe</h1>`);
-console.log(data);
-}
-
-function set(html){
-document.getElementById("content").innerHTML=html;
-}
-
-</script>
-
-</body>
-</html>
+</section>
