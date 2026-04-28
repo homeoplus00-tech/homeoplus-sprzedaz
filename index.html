@@ -40,12 +40,10 @@ justify-content:center;
 padding:80px;
 }
 
-/* MOBILE */
-
 @media(max-width:900px){
 .container{flex-direction:column;}
 .left{height:45%;}
-.right{height:55%;width:100%;padding:30px;align-items:center;text-align:center;}
+.right{height:55%;width:100%;padding:30px;}
 }
 
 /* TYPO */
@@ -53,31 +51,24 @@ padding:80px;
 h1{
 font-size:38px;
 font-weight:800;
-margin-bottom:20px;
 color:#ebdaa8;
+margin-bottom:20px;
 }
 
 /* INPUT */
 
 .input{
 width:100%;
-padding:14px;
+padding:16px;
 background:transparent;
 border:none;
 border-bottom:1px solid rgba(255,255,255,0.3);
 color:white;
 margin-bottom:20px;
+font-size:16px;
 }
 
-/* GRID */
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-width:100%;
-max-width:420px;
-}
+/* BUTTON */
 
 .option{
 border:1px solid rgba(255,255,255,0.2);
@@ -85,6 +76,7 @@ padding:16px;
 text-align:center;
 cursor:pointer;
 transition:0.3s;
+margin-top:10px;
 }
 
 .option:hover{
@@ -95,48 +87,38 @@ color:#ebdaa8;
 /* SVG */
 
 svg{
-width:380px;
-margin-bottom:20px;
+width:360px;
+margin-bottom:30px;
 }
 
 svg *{
 stroke:#ebdaa8;
 stroke-width:2;
 fill:none;
-transition:0.4s;
 }
 
 /* CARD */
 
 .card{
-width:320px;
-padding:16px;
+width:340px;
+padding:20px;
 border:1px solid rgba(255,255,255,0.15);
 background:rgba(255,255,255,0.03);
-font-size:13px;
+font-size:14px;
+line-height:1.6;
+}
+
+.card b{
 color:#ebdaa8;
 }
 
-/* STATES */
+/* ERROR */
 
-.problem *{
-stroke:red !important;
-stroke-dasharray:6;
-}
-
-.refresh *{
-opacity:0.5;
-}
-
-/* ANIM */
-
-.fade{
-animation:fade 0.4s ease;
-}
-
-@keyframes fade{
-from{opacity:0; transform:translateY(10px);}
-to{opacity:1; transform:translateY(0);}
+.error{
+color:red;
+font-size:13px;
+margin-top:-10px;
+margin-bottom:10px;
 }
 
 </style>
@@ -178,77 +160,75 @@ function stepCity(){
 set(`
 <h1>Lokalizacja</h1>
 <input id="city" class="input" placeholder="Miasto">
+<div class="error" id="err"></div>
 <div class="option" onclick="saveCity()">Dalej</div>
 `);
 }
 
-function stepLocation(){
+function stepHouseSize(){
 set(`
-<h1>Położenie</h1>
-<div class="grid">
-<div class="option" onclick="setLocation('centrum')">Centrum</div>
-<div class="option" onclick="setLocation('poza')">Poza miastem</div>
-</div>
+<h1>Metraż domu (m²)</h1>
+<input id="size" class="input" placeholder="np. 145">
+<div class="error" id="err"></div>
+<div class="option" onclick="saveSize()">Dalej</div>
 `);
 }
 
-function stepSize(){
+function stepPlot(){
 set(`
-<h1>Metraż domu</h1>
-<div class="grid">
-<div class="option" onclick="next('size','<100')">do 100</div>
-<div class="option" onclick="next('size','100-200')">100–200</div>
-<div class="option" onclick="next('size','200+')">200+</div>
-</div>
+<h1>Metraż działki (m²)</h1>
+<input id="plot" class="input" placeholder="np. 800">
+<div class="error" id="err"></div>
+<div class="option" onclick="savePlot()">Dalej</div>
+`);
+}
+
+function stepYear(){
+set(`
+<h1>Rok budowy</h1>
+<input id="year" class="input" placeholder="np. 2008">
+<div class="option" onclick="save('year',year.value)">Dalej</div>
 `);
 }
 
 function stepFloors(){
 set(`
 <h1>Kondygnacje</h1>
-<div class="grid">
 <div class="option" onclick="setFloors(1)">1</div>
 <div class="option" onclick="setFloors(2)">2+</div>
-</div>
 `);
 }
 
 function stepGarden(){
 set(`
 <h1>Ogród</h1>
-<div class="grid">
 <div class="option" onclick="setGarden(true)">Tak</div>
 <div class="option" onclick="setGarden(false)">Nie</div>
-</div>
 `);
 }
 
 function stepGarage(){
 set(`
 <h1>Garaż</h1>
-<div class="grid">
 <div class="option" onclick="setGarage(true)">Tak</div>
 <div class="option" onclick="setGarage(false)">Nie</div>
-</div>
+`);
+}
+
+function stepAccess(){
+set(`
+<h1>Dojazd do działki</h1>
+<div class="option" onclick="save('road','asfalt')">Asfalt</div>
+<div class="option" onclick="save('road','utwardzona')">Utwardzona</div>
 `);
 }
 
 function stepState(){
 set(`
 <h1>Stan</h1>
-<div class="grid">
 <div class="option" onclick="setState('ideal')">Gotowy</div>
 <div class="option" onclick="setState('refresh')">Do remontu</div>
 <div class="option" onclick="setState('problem')">Problemy prawne</div>
-</div>
-`);
-}
-
-function stepPhotos(){
-set(`
-<h1>Zdjęcia</h1>
-<input type="file" multiple class="input">
-<div class="option" onclick="finish()">Zakończ</div>
 `);
 }
 
@@ -256,135 +236,101 @@ set(`
 
 function saveCity(){
 let val = document.getElementById("city").value;
-if(!val) return;
+if(!val) return showError("err","Wpisz miasto");
 data.city = val;
 updateCard();
-stepLocation();
+stepHouseSize();
 }
 
-function next(k,v){
+function saveSize(){
+let val = document.getElementById("size").value;
+if(!val) return showError("err","Podaj metraż");
+data.size = val;
+updateCard();
+stepPlot();
+}
+
+function savePlot(){
+let val = document.getElementById("plot").value;
+if(!val) return showError("err","Podaj działkę");
+data.plot = val;
+updateCard();
+stepYear();
+}
+
+function save(k,v){
 data[k]=v;
 updateCard();
 
-if(k==="size") stepFloors();
+if(k==="year") stepFloors();
+if(k==="road") finish();
 }
 
-/* ===== SVG ===== */
+/* SVG */
 
 function drawBase(){
 document.getElementById("svg").innerHTML =
 `<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
 }
 
-/* LOCATION */
-
-function setLocation(v){
-data.location=v;
-
-let svg=document.getElementById("svg");
-
-if(v==="centrum"){
-svg.innerHTML+=`
-<rect x="40" y="140" width="30" height="100"/>
-<rect x="330" y="150" width="30" height="90"/>
-`;
-}else{
-svg.innerHTML+=`
-<path d="M40 280 Q60 240 80 280"/>
-<path d="M320 280 Q340 240 360 280"/>
-`;
-}
-
-updateCard();
-stepSize();
-}
-
-/* FLOORS */
-
 function setFloors(n){
 if(n===2){
-document.getElementById("svg").innerHTML+=
-`<line x1="100" y1="240" x2="300" y2="240"/>`;
+svg.innerHTML += `<line x1="100" y1="240" x2="300" y2="240"/>`;
 }
 updateCard();
 stepGarden();
 }
 
-/* GARDEN */
-
 function setGarden(v){
 if(v){
-document.getElementById("svg").innerHTML+=
-`<rect x="80" y="320" width="240" height="40"/>`;
+svg.innerHTML += `<rect x="80" y="320" width="240" height="40"/>`;
 }
 updateCard();
 stepGarage();
 }
 
-/* GARAGE */
-
 function setGarage(v){
 if(v){
-document.getElementById("svg").innerHTML+=
-`<rect x="280" y="260" width="40" height="40"/>`;
+svg.innerHTML += `<rect x="280" y="260" width="40" height="40"/>`;
 }
 updateCard();
-stepState();
+stepAccess();
 }
-
-/* STATE */
 
 function setState(s){
 data.state = s;
 
-let svg = document.getElementById("svg");
-
-if(s==="problem"){
-svg.classList.add("problem");
-
+if(s==="problem" || s==="refresh"){
 set(`
 <h1>OD ZERA+</h1>
-<p>Możemy przejąć wszystko: problemy prawne, remont, przygotowanie do sprzedaży.</p>
-
-<div class="grid">
-<div class="option" onclick="stepPhotos()">Kontynuuj standardowo</div>
-<div class="option" onclick="chooseZero()">Przejdź do OD ZERA+</div>
-</div>
+<p>Możemy przejąć wszystko: remont, problemy prawne, przygotowanie.</p>
+<div class="option" onclick="stepAccess()">Kontynuuj</div>
+<div class="option" onclick="finish()">OD ZERA+</div>
 `);
-
-}else if(s==="refresh"){
-svg.classList.add("refresh");
-
-set(`
-<h1>OD ZERA+</h1>
-<p>Możemy przygotować nieruchomość do sprzedaży (remont, sprzątanie).</p>
-
-<div class="grid">
-<div class="option" onclick="stepPhotos()">Kontynuuj</div>
-<div class="option" onclick="chooseZero()">OD ZERA+</div>
-</div>
-`);
-
 }else{
-stepPhotos();
+stepAccess();
 }
 
 updateCard();
-}
-
-function chooseZero(){
-set(`<h1>OD ZERA+</h1><p>Przejmujemy nieruchomość kompleksowo.</p>`);
 }
 
 /* CARD */
 
 function updateCard(){
-let txt = `
-${data.city || ""}
-${data.location ? " • "+data.location : ""}
-${data.size ? " • "+data.size : ""}
+document.getElementById("card").innerHTML = `
+<b>${data.city || ""}</b><br><br>
+
+<b>Dom:</b> ${data.size || "-"} m²<br>
+<b>Działka:</b> ${data.plot || "-"} m²<br>
+<b>Rok:</b> ${data.year || "-"}<br>
+<b>Dojazd:</b> ${data.road || "-"}
 `;
-document.getElementById("card").innerText = txt;
+}
+
+/* HELPERS */
+
+function showError(id,msg){
+document.getElementById(id).innerText=msg;
 }
 
 /* END */
@@ -394,11 +340,8 @@ set(`<h1>Gotowe</h1>`);
 console.log(data);
 }
 
-/* UI */
-
 function set(html){
-document.getElementById("content").innerHTML =
-`<div class="fade">${html}</div>`;
+document.getElementById("content").innerHTML=html;
 }
 
 </script>
