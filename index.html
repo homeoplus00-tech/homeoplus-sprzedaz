@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>HOMEO+ DOM</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,65 +12,48 @@
 
 body{
 margin:0;
-background:#0f1113;
+background:#0b0d10;
 color:white;
 font-family:Montserrat;
-overflow:hidden;
 }
+
+/* LAYOUT */
 
 .container{
 display:flex;
 height:100vh;
 }
 
-.left,.right{
-width:50%;
+.left{
+width:55%;
 display:flex;
-justify-content:center;
 align-items:center;
-flex-direction:column;
+justify-content:center;
+position:relative;
 }
 
 .right{
-align-items:flex-start;
-padding:60px;
+width:45%;
+display:flex;
+flex-direction:column;
+justify-content:center;
+padding:80px;
 }
 
 /* MOBILE */
 
 @media(max-width:900px){
 .container{flex-direction:column;}
-.left{height:40%;}
-.right{height:60%;width:100%;padding:20px;}
+.left{height:45%;}
+.right{height:55%;width:100%;padding:30px;align-items:center;text-align:center;}
 }
 
-/* UI */
+/* TYPO */
 
 h1{
-font-size:32px;
+font-size:40px;
 font-weight:800;
 margin-bottom:20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-width:100%;
-max-width:420px;
-}
-
-.option{
-border:1px solid rgba(255,255,255,0.2);
-padding:14px;
-text-align:center;
-cursor:pointer;
-transition:0.25s;
-}
-
-.option:hover{
-border-color:#ebdaa8;
-color:#ebdaa8;
 }
 
 .input{
@@ -82,10 +66,33 @@ color:white;
 margin-bottom:20px;
 }
 
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+width:100%;
+max-width:420px;
+}
+
+.option{
+border:1px solid rgba(255,255,255,0.2);
+padding:16px;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
+}
+
+.option:hover{
+border-color:#ebdaa8;
+color:#ebdaa8;
+}
+
 /* SVG */
 
 svg{
-width:280px;
+width:420px;
 transition:0.4s;
 }
 
@@ -94,6 +101,12 @@ stroke:#ebdaa8;
 stroke-width:2;
 fill:none;
 transition:0.4s;
+}
+
+/* BACKGROUND ELEMENTS */
+
+.bg{
+opacity:0.3;
 }
 
 /* STATES */
@@ -105,6 +118,22 @@ stroke-dasharray:6;
 
 .refresh *{
 opacity:0.5;
+}
+
+/* CARD */
+
+.card{
+position:absolute;
+bottom:40px;
+left:40px;
+color:#ebdaa8;
+font-weight:600;
+font-size:14px;
+max-width:300px;
+}
+
+@media(max-width:900px){
+.card{position:static;margin-top:20px;text-align:center;}
 }
 
 /* ANIM */
@@ -126,7 +155,11 @@ to{opacity:1; transform:translateY(0);}
 <div class="container">
 
 <div class="left">
+
 <svg id="svg" viewBox="0 0 400 400"></svg>
+
+<div class="card" id="card"></div>
+
 </div>
 
 <div class="right" id="content"></div>
@@ -144,6 +177,7 @@ start();
 function start(){
 drawBase();
 stepCity();
+updateCard();
 }
 
 /* ===== STEPS ===== */
@@ -160,30 +194,19 @@ function stepLocation(){
 set(`
 <h1>Położenie</h1>
 <div class="grid">
-<div class="option" onclick="next('location','centrum')">Centrum</div>
-<div class="option" onclick="next('location','poza')">Poza centrum</div>
+<div class="option" onclick="setLocation('centrum')">Centrum</div>
+<div class="option" onclick="setLocation('poza')">Poza miastem</div>
 </div>
 `);
 }
 
-function stepHouseSize(){
+function stepSize(){
 set(`
 <h1>Metraż domu</h1>
 <div class="grid">
-<div class="option" onclick="next('houseSize','<100')">do 100 m²</div>
-<div class="option" onclick="next('houseSize','100-200')">100–200</div>
-<div class="option" onclick="next('houseSize','200+')">200+</div>
-</div>
-`);
-}
-
-function stepPlot(){
-set(`
-<h1>Metraż działki</h1>
-<div class="grid">
-<div class="option" onclick="next('plot','<500')">do 500 m²</div>
-<div class="option" onclick="next('plot','500-1000')">500–1000</div>
-<div class="option" onclick="next('plot','1000+')">1000+</div>
+<div class="option" onclick="next('size','<100')">do 100</div>
+<div class="option" onclick="next('size','100-200')">100–200</div>
+<div class="option" onclick="next('size','200+')">200+</div>
 </div>
 `);
 }
@@ -218,12 +241,12 @@ set(`
 `);
 }
 
-function stepCondition(){
+function stepState(){
 set(`
-<h1>Stan techniczny</h1>
+<h1>Stan</h1>
 <div class="grid">
 <div class="option" onclick="setState('ideal')">Gotowy</div>
-<div class="option" onclick="setState('refresh')">Odświeżenie</div>
+<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
 <div class="option" onclick="setState('problem')">Problemy</div>
 </div>
 `);
@@ -231,7 +254,7 @@ set(`
 
 function stepPhotos(){
 set(`
-<h1>Dodaj zdjęcia</h1>
+<h1>Zdjęcia</h1>
 <input type="file" multiple class="input">
 <div class="option" onclick="finish()">Zakończ</div>
 `);
@@ -241,73 +264,124 @@ set(`
 
 function saveCity(){
 let val = document.getElementById("city").value;
-if(!val) return alert("Wpisz miasto");
+if(!val) return;
 data.city = val;
+updateCard();
 stepLocation();
 }
 
 function next(k,v){
 data[k]=v;
+updateCard();
 
-if(k==="location") stepHouseSize();
-else if(k==="houseSize") stepPlot();
-else if(k==="plot") stepFloors();
+if(k==="size") stepFloors();
 }
 
-/* SVG */
+/* ===== SVG ===== */
 
 function drawBase(){
-document.getElementById("svg").innerHTML =
-`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
+document.getElementById("svg").innerHTML = `
+<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>
+`;
 }
+
+/* LOCATION VISUAL */
+
+function setLocation(v){
+data.location=v;
+
+let svg = document.getElementById("svg");
+
+if(v==="centrum"){
+svg.innerHTML += `
+<rect class="bg" x="50" y="140" width="30" height="100"/>
+<rect class="bg" x="320" y="150" width="30" height="90"/>
+`;
+}else{
+svg.innerHTML += `
+<path class="bg" d="M50 280 Q60 240 80 280"/>
+<path class="bg" d="M320 280 Q340 240 360 280"/>
+`;
+}
+
+updateCard();
+stepSize();
+}
+
+/* FLOORS */
 
 function setFloors(n){
 if(n===2){
 document.getElementById("svg").innerHTML +=
 `<line x1="100" y1="240" x2="300" y2="240"/>`;
 }
+updateCard();
 stepGarden();
 }
+
+/* GARDEN */
 
 function setGarden(v){
 if(v){
 document.getElementById("svg").innerHTML +=
 `<rect x="80" y="320" width="240" height="40"/>`;
 }
+updateCard();
 stepGarage();
 }
+
+/* GARAGE */
 
 function setGarage(v){
 if(v){
 document.getElementById("svg").innerHTML +=
 `<rect x="280" y="260" width="40" height="40"/>`;
 }
-stepCondition();
+updateCard();
+stepState();
 }
+
+/* STATE */
 
 function setState(s){
 data.state = s;
 
 let svg = document.getElementById("svg");
 
-if(s==="problem") svg.classList.add("problem");
-if(s==="refresh") svg.classList.add("refresh");
-
 if(s==="problem"){
+svg.classList.add("problem");
+
 set(`
 <h1>OD ZERA+</h1>
-<p>Przejmujemy nieruchomość od podstaw – rozwiązujemy problemy prawne, techniczne i przygotowujemy do sprzedaży.</p>
+<p>Rozwiązujemy wszystkie problemy prawne, techniczne i przygotowujemy nieruchomość do sprzedaży.</p>
 <div class="option" onclick="stepPhotos()">Dalej</div>
 `);
+
+}else if(s==="refresh"){
+svg.classList.add("refresh");
+stepPhotos();
 }else{
 stepPhotos();
 }
+
+updateCard();
+}
+
+/* ===== CARD ===== */
+
+function updateCard(){
+let txt = `
+${data.city ? data.city : ""}
+${data.location ? " • "+data.location : ""}
+${data.size ? " • "+data.size : ""}
+`;
+document.getElementById("card").innerText = txt;
 }
 
 /* END */
 
 function finish(){
-set(`<h1>Gotowe</h1><p>Dane zapisane</p>`);
+set(`<h1>Gotowe</h1>`);
 console.log(data);
 }
 
