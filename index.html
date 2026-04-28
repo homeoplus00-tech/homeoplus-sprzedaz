@@ -3,14 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOMEO+</title>
+<title>HOMEO+ DOM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
+
 body{
 margin:0;
 background:#0f1113;
 color:white;
-font-family:Montserrat, sans-serif;
+font-family:Montserrat;
+overflow:hidden;
 }
 
 .container{
@@ -21,15 +25,17 @@ height:100vh;
 .left,.right{
 width:50%;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
+flex-direction:column;
 }
 
 .right{
 align-items:flex-start;
-padding:50px;
+padding:60px;
 }
+
+/* MOBILE */
 
 @media(max-width:900px){
 .container{flex-direction:column;}
@@ -40,23 +46,25 @@ padding:50px;
 /* UI */
 
 h1{
-font-size:28px;
+font-size:32px;
+font-weight:800;
 margin-bottom:20px;
 }
 
 .grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px;
+gap:12px;
 width:100%;
-max-width:400px;
+max-width:420px;
 }
 
 .option{
-border:1px solid #444;
-padding:12px;
-cursor:pointer;
+border:1px solid rgba(255,255,255,0.2);
+padding:14px;
 text-align:center;
+cursor:pointer;
+transition:0.25s;
 }
 
 .option:hover{
@@ -64,16 +72,28 @@ border-color:#ebdaa8;
 color:#ebdaa8;
 }
 
+.input{
+width:100%;
+padding:14px;
+background:transparent;
+border:none;
+border-bottom:1px solid rgba(255,255,255,0.3);
+color:white;
+margin-bottom:20px;
+}
+
 /* SVG */
 
 svg{
-width:260px;
+width:280px;
+transition:0.4s;
 }
 
-line, rect{
+svg *{
 stroke:#ebdaa8;
-fill:none;
 stroke-width:2;
+fill:none;
+transition:0.4s;
 }
 
 /* STATES */
@@ -85,6 +105,17 @@ stroke-dasharray:6;
 
 .refresh *{
 opacity:0.5;
+}
+
+/* ANIM */
+
+.fade{
+animation:fade 0.4s ease;
+}
+
+@keyframes fade{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
 }
 
 </style>
@@ -104,8 +135,6 @@ opacity:0.5;
 
 <script>
 
-/* STATE */
-
 let data = {};
 
 /* START */
@@ -113,15 +142,6 @@ let data = {};
 start();
 
 function start(){
-document.getElementById("content").innerHTML = `
-<h1>SPRZEDAŻ+</h1>
-<div class="option" onclick="startFlow()">Rozpocznij</div>
-`;
-}
-
-/* FLOW */
-
-function startFlow(){
 drawBase();
 stepCity();
 }
@@ -131,7 +151,7 @@ stepCity();
 function stepCity(){
 set(`
 <h1>Lokalizacja</h1>
-<input id="city" class="option" placeholder="Miasto">
+<input id="city" class="input" placeholder="Miasto">
 <div class="option" onclick="saveCity()">Dalej</div>
 `);
 }
@@ -140,155 +160,130 @@ function stepLocation(){
 set(`
 <h1>Położenie</h1>
 <div class="grid">
-<div class="option" onclick="save('location','centrum')">Centrum</div>
-<div class="option" onclick="save('location','poza')">Poza centrum</div>
+<div class="option" onclick="next('location','centrum')">Centrum</div>
+<div class="option" onclick="next('location','poza')">Poza centrum</div>
 </div>
 `);
 }
 
-function stepSize(){
+function stepHouseSize(){
 set(`
-<h1>Metraż</h1>
+<h1>Metraż domu</h1>
 <div class="grid">
-<div class="option" onclick="save('size','<40')">do 40</div>
-<div class="option" onclick="save('size','40-60')">40–60</div>
-<div class="option" onclick="save('size','60-100')">60–100</div>
-<div class="option" onclick="save('size','100+')">100+</div>
+<div class="option" onclick="next('houseSize','<100')">do 100 m²</div>
+<div class="option" onclick="next('houseSize','100-200')">100–200</div>
+<div class="option" onclick="next('houseSize','200+')">200+</div>
 </div>
 `);
 }
 
-function stepRooms(){
+function stepPlot(){
 set(`
-<h1>Pokoje</h1>
+<h1>Metraż działki</h1>
 <div class="grid">
-${[1,2,3,4,'5+'].map(n=>`<div class="option" onclick="setRooms('${n}')">${n}</div>`).join("")}
+<div class="option" onclick="next('plot','<500')">do 500 m²</div>
+<div class="option" onclick="next('plot','500-1000')">500–1000</div>
+<div class="option" onclick="next('plot','1000+')">1000+</div>
 </div>
 `);
 }
 
-function stepFloor(){
+function stepFloors(){
 set(`
-<h1>Piętro</h1>
+<h1>Kondygnacje</h1>
 <div class="grid">
-<div class="option" onclick="setFloor(0)">Parter</div>
-<div class="option" onclick="setFloor(-10)">Środek</div>
-<div class="option" onclick="setFloor(-20)">Wysokie</div>
+<div class="option" onclick="setFloors(1)">1</div>
+<div class="option" onclick="setFloors(2)">2+</div>
 </div>
 `);
 }
 
-function stepElevator(){
+function stepGarden(){
 set(`
-<h1>Winda</h1>
+<h1>Ogród</h1>
 <div class="grid">
-<div class="option" onclick="save('elevator',true)">Tak</div>
-<div class="option" onclick="save('elevator',false)">Nie</div>
+<div class="option" onclick="setGarden(true)">Tak</div>
+<div class="option" onclick="setGarden(false)">Nie</div>
 </div>
 `);
 }
 
-function stepBalcony(){
+function stepGarage(){
 set(`
-<h1>Balkon / taras</h1>
+<h1>Garaż</h1>
 <div class="grid">
-<div class="option" onclick="setBalcony(true)">Tak</div>
-<div class="option" onclick="setBalcony(false)">Nie</div>
+<div class="option" onclick="setGarage(true)">Tak</div>
+<div class="option" onclick="setGarage(false)">Nie</div>
 </div>
 `);
 }
 
-function stepParking(){
+function stepCondition(){
 set(`
-<h1>Parking</h1>
+<h1>Stan techniczny</h1>
 <div class="grid">
-<div class="option" onclick="save('parking',true)">Tak</div>
-<div class="option" onclick="save('parking',false)">Nie</div>
-</div>
-`);
-}
-
-function stepStandard(){
-set(`
-<h1>Standard</h1>
-<div class="grid">
-<div class="option" onclick="save('standard','premium')">Premium</div>
-<div class="option" onclick="save('standard','ok')">Dobry</div>
-<div class="option" onclick="save('standard','remont')">Do remontu</div>
-</div>
-`);
-}
-
-function stepState(){
-set(`
-<h1>Stan prawny / sytuacja</h1>
-<div class="grid">
-<div class="option" onclick="setState('ideal')">Gotowa</div>
-<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
+<div class="option" onclick="setState('ideal')">Gotowy</div>
+<div class="option" onclick="setState('refresh')">Odświeżenie</div>
 <div class="option" onclick="setState('problem')">Problemy</div>
 </div>
+`);
+}
+
+function stepPhotos(){
+set(`
+<h1>Dodaj zdjęcia</h1>
+<input type="file" multiple class="input">
+<div class="option" onclick="finish()">Zakończ</div>
 `);
 }
 
 /* ===== ACTIONS ===== */
 
 function saveCity(){
-data.city = document.getElementById("city").value;
+let val = document.getElementById("city").value;
+if(!val) return alert("Wpisz miasto");
+data.city = val;
 stepLocation();
 }
 
-function save(k,v){
+function next(k,v){
 data[k]=v;
 
-if(k==="location") stepSize();
-else if(k==="size") stepRooms();
-else if(k==="elevator") stepBalcony();
-else if(k==="parking") stepStandard();
-else if(k==="standard") stepState();
+if(k==="location") stepHouseSize();
+else if(k==="houseSize") stepPlot();
+else if(k==="plot") stepFloors();
 }
 
 /* SVG */
 
 function drawBase(){
-let svg = document.getElementById("svg");
-svg.innerHTML = `<rect x="100" y="120" width="200" height="200"/>`;
+document.getElementById("svg").innerHTML =
+`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
 }
 
-/* ROOMS */
-
-function setRooms(n){
-let svg = document.getElementById("svg");
-
-drawBase();
-
-let count = n==="5+"?5:n;
-
-for(let i=1;i<count;i++){
-let x = 100 + (i*(200/count));
-svg.innerHTML += `<line x1="${x}" y1="120" x2="${x}" y2="320"/>`;
+function setFloors(n){
+if(n===2){
+document.getElementById("svg").innerHTML +=
+`<line x1="100" y1="240" x2="300" y2="240"/>`;
+}
+stepGarden();
 }
 
-stepFloor();
-}
-
-/* FLOOR */
-
-function setFloor(val){
-document.getElementById("svg").style.transform=`translateY(${val}px)`;
-stepElevator();
-}
-
-/* BALCONY */
-
-function setBalcony(v){
+function setGarden(v){
 if(v){
 document.getElementById("svg").innerHTML +=
-`<rect x="150" y="320" width="100" height="20"/>`;
+`<rect x="80" y="320" width="240" height="40"/>`;
 }
-stepParking();
+stepGarage();
 }
 
-/* STATE */
+function setGarage(v){
+if(v){
+document.getElementById("svg").innerHTML +=
+`<rect x="280" y="260" width="40" height="40"/>`;
+}
+stepCondition();
+}
 
 function setState(s){
 data.state = s;
@@ -298,26 +293,29 @@ let svg = document.getElementById("svg");
 if(s==="problem") svg.classList.add("problem");
 if(s==="refresh") svg.classList.add("refresh");
 
-finish();
+if(s==="problem"){
+set(`
+<h1>OD ZERA+</h1>
+<p>Przejmujemy nieruchomość od podstaw – rozwiązujemy problemy prawne, techniczne i przygotowujemy do sprzedaży.</p>
+<div class="option" onclick="stepPhotos()">Dalej</div>
+`);
+}else{
+stepPhotos();
+}
 }
 
 /* END */
 
 function finish(){
-
-if(data.state==="problem"){
-set(`<h1>OD ZERA+</h1><p>Zajmujemy się wszystkim od podstaw.</p>`);
-}else{
-set(`<h1>SPRZEDAŻ+</h1><p>Przechodzimy dalej.</p>`);
-}
-
+set(`<h1>Gotowe</h1><p>Dane zapisane</p>`);
 console.log(data);
 }
 
 /* UI */
 
 function set(html){
-document.getElementById("content").innerHTML = html;
+document.getElementById("content").innerHTML =
+`<div class="fade">${html}</div>`;
 }
 
 </script>
