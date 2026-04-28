@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>HOMEO+ DOM</title>
+<title>HOMEO+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
@@ -27,9 +27,9 @@ height:100vh;
 .left{
 width:55%;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
-position:relative;
 }
 
 .right{
@@ -51,10 +51,13 @@ padding:80px;
 /* TYPO */
 
 h1{
-font-size:40px;
+font-size:38px;
 font-weight:800;
 margin-bottom:20px;
+color:#ebdaa8;
 }
+
+/* INPUT */
 
 .input{
 width:100%;
@@ -92,8 +95,8 @@ color:#ebdaa8;
 /* SVG */
 
 svg{
-width:420px;
-transition:0.4s;
+width:380px;
+margin-bottom:20px;
 }
 
 svg *{
@@ -103,10 +106,15 @@ fill:none;
 transition:0.4s;
 }
 
-/* BACKGROUND ELEMENTS */
+/* CARD */
 
-.bg{
-opacity:0.3;
+.card{
+width:320px;
+padding:16px;
+border:1px solid rgba(255,255,255,0.15);
+background:rgba(255,255,255,0.03);
+font-size:13px;
+color:#ebdaa8;
 }
 
 /* STATES */
@@ -118,22 +126,6 @@ stroke-dasharray:6;
 
 .refresh *{
 opacity:0.5;
-}
-
-/* CARD */
-
-.card{
-position:absolute;
-bottom:40px;
-left:40px;
-color:#ebdaa8;
-font-weight:600;
-font-size:14px;
-max-width:300px;
-}
-
-@media(max-width:900px){
-.card{position:static;margin-top:20px;text-align:center;}
 }
 
 /* ANIM */
@@ -246,8 +238,8 @@ set(`
 <h1>Stan</h1>
 <div class="grid">
 <div class="option" onclick="setState('ideal')">Gotowy</div>
-<div class="option" onclick="setState('refresh')">Do odświeżenia</div>
-<div class="option" onclick="setState('problem')">Problemy</div>
+<div class="option" onclick="setState('refresh')">Do remontu</div>
+<div class="option" onclick="setState('problem')">Problemy prawne</div>
 </div>
 `);
 }
@@ -280,27 +272,26 @@ if(k==="size") stepFloors();
 /* ===== SVG ===== */
 
 function drawBase(){
-document.getElementById("svg").innerHTML = `
-<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>
-`;
+document.getElementById("svg").innerHTML =
+`<path d="M100 200 L200 120 L300 200 V300 H100 Z"/>`;
 }
 
-/* LOCATION VISUAL */
+/* LOCATION */
 
 function setLocation(v){
 data.location=v;
 
-let svg = document.getElementById("svg");
+let svg=document.getElementById("svg");
 
 if(v==="centrum"){
-svg.innerHTML += `
-<rect class="bg" x="50" y="140" width="30" height="100"/>
-<rect class="bg" x="320" y="150" width="30" height="90"/>
+svg.innerHTML+=`
+<rect x="40" y="140" width="30" height="100"/>
+<rect x="330" y="150" width="30" height="90"/>
 `;
 }else{
-svg.innerHTML += `
-<path class="bg" d="M50 280 Q60 240 80 280"/>
-<path class="bg" d="M320 280 Q340 240 360 280"/>
+svg.innerHTML+=`
+<path d="M40 280 Q60 240 80 280"/>
+<path d="M320 280 Q340 240 360 280"/>
 `;
 }
 
@@ -312,7 +303,7 @@ stepSize();
 
 function setFloors(n){
 if(n===2){
-document.getElementById("svg").innerHTML +=
+document.getElementById("svg").innerHTML+=
 `<line x1="100" y1="240" x2="300" y2="240"/>`;
 }
 updateCard();
@@ -323,7 +314,7 @@ stepGarden();
 
 function setGarden(v){
 if(v){
-document.getElementById("svg").innerHTML +=
+document.getElementById("svg").innerHTML+=
 `<rect x="80" y="320" width="240" height="40"/>`;
 }
 updateCard();
@@ -334,7 +325,7 @@ stepGarage();
 
 function setGarage(v){
 if(v){
-document.getElementById("svg").innerHTML +=
+document.getElementById("svg").innerHTML+=
 `<rect x="280" y="260" width="40" height="40"/>`;
 }
 updateCard();
@@ -353,13 +344,27 @@ svg.classList.add("problem");
 
 set(`
 <h1>OD ZERA+</h1>
-<p>Rozwiązujemy wszystkie problemy prawne, techniczne i przygotowujemy nieruchomość do sprzedaży.</p>
-<div class="option" onclick="stepPhotos()">Dalej</div>
+<p>Możemy przejąć wszystko: problemy prawne, remont, przygotowanie do sprzedaży.</p>
+
+<div class="grid">
+<div class="option" onclick="stepPhotos()">Kontynuuj standardowo</div>
+<div class="option" onclick="chooseZero()">Przejdź do OD ZERA+</div>
+</div>
 `);
 
 }else if(s==="refresh"){
 svg.classList.add("refresh");
-stepPhotos();
+
+set(`
+<h1>OD ZERA+</h1>
+<p>Możemy przygotować nieruchomość do sprzedaży (remont, sprzątanie).</p>
+
+<div class="grid">
+<div class="option" onclick="stepPhotos()">Kontynuuj</div>
+<div class="option" onclick="chooseZero()">OD ZERA+</div>
+</div>
+`);
+
 }else{
 stepPhotos();
 }
@@ -367,11 +372,15 @@ stepPhotos();
 updateCard();
 }
 
-/* ===== CARD ===== */
+function chooseZero(){
+set(`<h1>OD ZERA+</h1><p>Przejmujemy nieruchomość kompleksowo.</p>`);
+}
+
+/* CARD */
 
 function updateCard(){
 let txt = `
-${data.city ? data.city : ""}
+${data.city || ""}
 ${data.location ? " • "+data.location : ""}
 ${data.size ? " • "+data.size : ""}
 `;
